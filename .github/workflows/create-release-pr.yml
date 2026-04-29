@@ -36,6 +36,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check release PR token
+        run: |
+          if [ -z "${CHANGESETS_TOKEN}" ]; then
+            echo "CHANGESETS_TOKEN is required to create release pull requests."
+            echo "Create a repository secret with contents:write and pull_requests:write permissions."
+            exit 1
+          fi
+        env:
+          CHANGESETS_TOKEN: ${{ secrets.CHANGESETS_TOKEN }}
+
       - name: Create or update release PR
         uses: changesets/action@v1
         with:
@@ -43,4 +53,4 @@ jobs:
           commit: "chore: version packages"
           title: "chore: version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.CHANGESETS_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CHANGESETS_TOKEN }}
