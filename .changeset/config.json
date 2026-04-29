@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "ShionTerunaga/frontend-template-cli"
+      "repo": "ShionTerunaga/gh-issue"
     }
   ],
   "commit": false,

@@ -2,14 +2,14 @@
   "name": "gh-issue",
   "version": "0.0.0",
   "description": "A command line tool for GitHub issues.",
-  "homepage": "https://github.com/OWNER/gh-issue#readme",
+  "homepage": "https://github.com/ShionTerunaga/gh-issue#readme",
   "bugs": {
-    "url": "https://github.com/OWNER/gh-issue/issues"
+    "url": "https://github.com/ShionTerunaga/gh-issue/issues"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OWNER/gh-issue.git"
+    "url": "git+https://github.com/ShionTerunaga/gh-issue.git"
   },
   "bin": {
     "gh-issue": "./dist/index.mjs"
