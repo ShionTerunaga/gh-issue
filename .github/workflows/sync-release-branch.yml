@@ -25,12 +25,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
           ref: main
 
       - name: Capture release branch range
         id: release-range
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git fetch origin release || true
+          git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
 
           if git rev-parse --verify origin/release >/dev/null 2>&1; then
             echo "before_sha=$(git rev-parse origin/release)" >> "$GITHUB_OUTPUT"
@@ -61,6 +66,9 @@ jobs:
       - name: Prepare release branch contents
         run: |
           cp ./scripts/release-notes/create-release-from-changelog.ts "$RUNNER_TEMP/create-release-from-changelog.ts"
+          release_dir="$RUNNER_TEMP/release-branch"
+          rm -rf "$release_dir"
+          mkdir -p "$release_dir"
 
           node --input-type=module <<'NODE'
           import { readFileSync, writeFileSync } from "node:fs";
@@ -93,18 +101,16 @@ jobs:
           writeFileSync("package.json", `${JSON.stringify(releasePackage, null, 2)}\n`);
           NODE
 
-          find . -mindepth 1 \
-            ! -path "./.git" \
-            ! -path "./.git/*" \
-            ! -path "./dist" \
-            ! -path "./dist/*" \
-            ! -path "./CHANGELOG.md" \
-            ! -path "./LICENSE" \
-            ! -path "./package.json" \
-            -exec rm -rf {} +
+          cp -R dist "$release_dir/dist"
+          cp CHANGELOG.md LICENSE package.json "$release_dir/"
+
+          git rm -r --ignore-unmatch .
+          cp -R "$release_dir"/. .
 
       - name: Sync release branch
         id: sync-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add -A
           git add -f dist CHANGELOG.md LICENSE package.json
@@ -115,6 +121,12 @@ jobs:
             git commit -m "chore: sync release branch"
           fi
 
+          cleanup_remote() {
+            git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          }
+
+          trap cleanup_remote EXIT
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git push origin HEAD:refs/heads/release --force
           echo "after_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
