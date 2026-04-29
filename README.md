@@ -7,7 +7,7 @@ A command line tool for generating GitHub Issue templates.
 ## Installation
 
 ```sh
-npm install -g github:ShionTerunga/gh-issue#release
+npm install github:ShionTerunga/gh-issue#release
 ```
 
 ## Usage
