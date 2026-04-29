@@ -1,0 +1,88 @@
+name: Sync Release Branch
+
+on:
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-release-branch
+  cancel-in-progress: true
+
+jobs:
+  sync-release:
+    if: >
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'changeset-release/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Capture release branch range
+        id: release-range
+        run: |
+          git fetch origin release || true
+
+          if git rev-parse --verify origin/release >/dev/null 2>&1; then
+            echo "before_sha=$(git rev-parse origin/release)" >> "$GITHUB_OUTPUT"
+          else
+            echo "before_sha=0000000000000000000000000000000000000000" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.6.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit generated template updates to main
+        run: |
+          if [ -z "$(git status --short -- template)" ]; then
+            echo "No generated template updates."
+            exit 0
+          fi
+
+          git add template
+          git commit -m "chore: sync templates after release merge"
+          git push origin HEAD:main
+
+      - name: Sync release branch to latest main
+        id: sync-release
+        run: |
+          git fetch origin main
+          git push origin origin/main:refs/heads/release --force
+          echo "after_sha=$(git rev-parse origin/main)" >> "$GITHUB_OUTPUT"
+
+      - name: Build project release metadata from changelogs
+        id: releases
+        run: node --experimental-strip-types ./scripts/release-notes/extract-release-notes.ts "${{ steps.release-range.outputs.before_sha }}" "${{ steps.sync-release.outputs.after_sha }}"
+
+      - name: Create or update GitHub Releases
+        if: steps.releases.outputs.has_releases == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_SHA: ${{ steps.sync-release.outputs.after_sha }}
+          MANIFEST_PATH: ${{ steps.releases.outputs.manifest_path }}
+        run: node --experimental-strip-types ./scripts/release-notes/create-github-release.ts

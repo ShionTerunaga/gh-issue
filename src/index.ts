@@ -10,8 +10,15 @@ const templateAliases = new Map([
   ["feature", "feature_request"],
 ]);
 
-function getTemplateRoot() {
-  return join(dirname(fileURLToPath(import.meta.url)), "..", "template");
+function getTemplatePaths(name: string, language: string) {
+  const templateName = resolveTemplateName(name);
+  const localizedName = language === "ja" ? `${templateName}_ja` : templateName;
+  const moduleDir = dirname(fileURLToPath(import.meta.url));
+
+  return [
+    join(moduleDir, "template", language, `${localizedName}.yml`),
+    join(moduleDir, "..", "template", language, `${localizedName}.yml`),
+  ];
 }
 
 function parseLanguage(argv: string[]) {
@@ -28,10 +35,17 @@ function isOptionValue(argv: string[], index: number) {
 }
 
 export async function createIssueTemplateYaml(name: string, language = defaultLanguage) {
-  const templateName = resolveTemplateName(name);
-  const localizedName = language === "ja" ? `${templateName}_ja` : templateName;
+  const [bundledTemplatePath, sourceTemplatePath] = getTemplatePaths(name, language);
 
-  return readFile(join(getTemplateRoot(), language, `${localizedName}.yml`), "utf8");
+  try {
+    return await readFile(bundledTemplatePath, "utf8");
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+      return readFile(sourceTemplatePath, "utf8");
+    }
+
+    throw error;
+  }
 }
 
 function parseTemplateArgs(argv: string[]) {

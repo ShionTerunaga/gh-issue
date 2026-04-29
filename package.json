@@ -16,7 +16,6 @@
   },
   "files": [
     "dist",
-    "template",
     "README.md",
     "LICENSE"
   ],
@@ -28,22 +27,32 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && pnpm copy:template",
+    "changeset": "changeset",
+    "copy:template": "tsx scripts/copy-template.ts",
     "test": "vitest run",
     "lint": "oxlint .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "check": "pnpm lint && pnpm format:check && pnpm test && pnpm build",
-    "prepack": "pnpm build"
+    "prepack": "pnpm build",
+    "init": "lefthook install",
+    "version:packages": "changeset version"
   },
   "dependencies": {
     "gh": "^2.8.9",
     "ts-shared": "github:ShionTerunaga/ts-shared#release"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/cli": "^2.31.0",
+    "@commitlint/cli": "^20.5.2",
+    "@commitlint/config-conventional": "^20.5.0",
     "@types/node": "latest",
+    "lefthook": "^2.1.6",
     "oxfmt": "latest",
     "oxlint": "latest",
+    "tsx": "latest",
     "typescript": "latest",
     "vite": "latest",
     "vitest": "latest"
