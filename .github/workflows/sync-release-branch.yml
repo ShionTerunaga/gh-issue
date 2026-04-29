@@ -104,7 +104,7 @@ jobs:
           cp -R dist "$release_dir/dist"
           cp CHANGELOG.md LICENSE package.json "$release_dir/"
 
-          git rm -r --ignore-unmatch .
+          git rm -r -f --ignore-unmatch .
           cp -R "$release_dir"/. .
 
       - name: Sync release branch
