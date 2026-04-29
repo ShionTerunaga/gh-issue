@@ -58,13 +58,13 @@ function getPackageHeading(filePath: string, content: string): string {
 function extractLatestSection(filePath: string): string | null {
   const content = readFileSync(filePath, "utf8");
   const lines = content.split(/\r?\n/);
-  const startIndex = lines.findIndex((line) => /^## /.test(line));
+  const startIndex = lines.findIndex((line) => line.startsWith('## '));
 
   if (startIndex === -1) {
     return null;
   }
 
-  const nextIndex = lines.findIndex((line, index) => index > startIndex && /^## /.test(line));
+  const nextIndex = lines.findIndex((line, index) => index > startIndex && line.startsWith('## '));
   const endIndex = nextIndex === -1 ? lines.length : nextIndex;
   const heading = getPackageHeading(filePath, content);
   const section = lines.slice(startIndex, endIndex).join("\n").trim();

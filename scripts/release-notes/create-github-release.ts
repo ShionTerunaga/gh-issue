@@ -55,7 +55,7 @@ async function githubRequest<T>(
       Accept: "application/vnd.github+json",
       Authorization: `Bearer ${token}`,
       "X-GitHub-Api-Version": "2022-11-28",
-      ...(init.headers ?? {}),
+      ...init.headers,
     },
   });
 
