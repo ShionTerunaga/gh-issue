@@ -48,39 +48,78 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm i --frozen-lockfile
+
+      - name: Build CLI
+        run: pnpm build
 
       - name: Configure git author
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit generated template updates to main
+      - name: Prepare release branch contents
         run: |
-          if [ -z "$(git status --short -- template)" ]; then
-            echo "No generated template updates."
-            exit 0
-          fi
+          cp ./scripts/release-notes/create-release-from-changelog.ts "$RUNNER_TEMP/create-release-from-changelog.ts"
 
-          git add template
-          git commit -m "chore: sync templates after release merge"
-          git push origin HEAD:main
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from "node:fs";
 
-      - name: Sync release branch to latest main
+          const pkg = JSON.parse(readFileSync("package.json", "utf8"));
+          const runtimeDependencies = Object.fromEntries(
+            Object.entries(pkg.dependencies ?? {}).filter(([name]) =>
+              ["commander", "fast-glob", "prompts", "ts-shared"].includes(name),
+            ),
+          );
+
+          const releasePackage = {
+            name: pkg.name,
+            version: pkg.version,
+            description: pkg.description,
+            homepage: pkg.homepage,
+            bugs: pkg.bugs,
+            license: pkg.license,
+            repository: pkg.repository,
+            bin: pkg.bin,
+            files: ["dist", "LICENSE"],
+            type: pkg.type,
+            main: pkg.main,
+            exports: pkg.exports,
+            publishConfig: pkg.publishConfig,
+            dependencies: runtimeDependencies,
+            engines: pkg.engines,
+          };
+
+          writeFileSync("package.json", `${JSON.stringify(releasePackage, null, 2)}\n`);
+          NODE
+
+          find . -mindepth 1 \
+            ! -path "./.git" \
+            ! -path "./.git/*" \
+            ! -path "./dist" \
+            ! -path "./dist/*" \
+            ! -path "./CHANGELOG.md" \
+            ! -path "./LICENSE" \
+            ! -path "./package.json" \
+            -exec rm -rf {} +
+
+      - name: Sync release branch
         id: sync-release
         run: |
-          git fetch origin main
-          git push origin origin/main:refs/heads/release --force
-          echo "after_sha=$(git rev-parse origin/main)" >> "$GITHUB_OUTPUT"
+          git add -A
+          git add -f dist CHANGELOG.md LICENSE package.json
 
-      - name: Build project release metadata from changelogs
-        id: releases
-        run: node --experimental-strip-types ./scripts/release-notes/extract-release-notes.ts "${{ steps.release-range.outputs.before_sha }}" "${{ steps.sync-release.outputs.after_sha }}"
+          if git diff --cached --quiet; then
+            echo "No release branch changes."
+          else
+            git commit -m "chore: sync release branch"
+          fi
 
-      - name: Create or update GitHub Releases
-        if: steps.releases.outputs.has_releases == 'true'
+          git push origin HEAD:refs/heads/release --force
+          echo "after_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_SHA: ${{ steps.sync-release.outputs.after_sha }}
-          MANIFEST_PATH: ${{ steps.releases.outputs.manifest_path }}
-        run: node --experimental-strip-types ./scripts/release-notes/create-github-release.ts
+        run: node --experimental-strip-types "$RUNNER_TEMP/create-release-from-changelog.ts"
