@@ -1,10 +1,6 @@
 import { Command } from "commander";
-import { initIssueTemplates } from "../templates";
-import prompts, { type InitialReturnValue } from "prompts";
+import { type InitialReturnValue } from "prompts";
 import { initAction } from "../action/init";
-
-type IssueTemplateType = "bug_report" | "feature_request";
-type Language = "en" | "ja";
 
 export const onPromptState = (state: {
   value: InitialReturnValue;
