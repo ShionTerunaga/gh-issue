@@ -1,6 +1,6 @@
-import prompts from "prompts";
 import { Result, resultUtility, type Option } from "ts-shared";
-import { onPromptState } from "./core";
+import { createPromptError } from "../shared/error";
+import { confirm, isCancel, multiselect } from "@clack/prompts";
 
 type IssueTemplateType = "bug_report" | "feature_request";
 export type Language = "en" | "ja";
@@ -37,26 +37,14 @@ const languageChoices = [
   },
 ];
 
-function createPromptError(message: string, error: unknown) {
-  if (error instanceof Error) {
-    return new Error(`${message}: ${error.message}`);
-  }
-
-  return new Error(`${message}: ${String(error)}`);
-}
-
 export async function selectIssueTemplateTypes(): Promise<Result<IssueTemplateType[], Error>> {
   const { checkPromiseReturn, createNg, createOk } = resultUtility;
 
   const response = await checkPromiseReturn({
     fn: async () =>
-      await prompts({
-        onState: onPromptState,
-        type: "multiselect",
-        name: "type",
+      await multiselect({
         message: "Select issue template types",
-        choices: issueTemplateTypeChoices,
-        min: 1,
+        options: issueTemplateTypeChoices,
       }),
     err: (e) => createNg(createPromptError("Failed to select issue template types", e)),
   });
@@ -65,7 +53,12 @@ export async function selectIssueTemplateTypes(): Promise<Result<IssueTemplateTy
     return response;
   }
 
-  return createOk(response.value.type as IssueTemplateType[]);
+  if (isCancel(response.value)) {
+    console.log("No template types selected. Canceled.");
+    process.exit(0);
+  }
+
+  return createOk(response.value as IssueTemplateType[]);
 }
 
 export async function selectLanguages(): Promise<Result<Language[], Error>> {
@@ -73,13 +66,9 @@ export async function selectLanguages(): Promise<Result<Language[], Error>> {
 
   const response = await checkPromiseReturn({
     fn: async () =>
-      await prompts({
-        onState: onPromptState,
-        type: "multiselect",
-        name: "lang",
+      await multiselect({
         message: "Select template languages",
-        choices: languageChoices,
-        min: 1,
+        options: languageChoices,
       }),
     err: (e) => createNg(createPromptError("Failed to select template languages", e)),
   });
@@ -88,7 +77,12 @@ export async function selectLanguages(): Promise<Result<Language[], Error>> {
     return response;
   }
 
-  return createOk(response.value.lang as Language[]);
+  if (isCancel(response.value)) {
+    console.log("No languages selected. Canceled.");
+    process.exit(0);
+  }
+
+  return createOk(response.value as Language[]);
 }
 
 export async function confirmInit(): Promise<Result<boolean, Error>> {
@@ -96,12 +90,8 @@ export async function confirmInit(): Promise<Result<boolean, Error>> {
 
   const response = await checkPromiseReturn({
     fn: async () =>
-      await prompts({
-        onState: onPromptState,
-        type: "confirm",
-        name: "yes",
+      await confirm({
         message: `This will create issue templates in .github/ISSUE_TEMPLATE. Do you want to continue?`,
-        initial: true,
       }),
     err: (e) => createNg(createPromptError("Failed to get user confirmation", e)),
   });
@@ -110,5 +100,10 @@ export async function confirmInit(): Promise<Result<boolean, Error>> {
     return response;
   }
 
-  return createOk(response.value.yes as boolean);
+  if (isCancel(response.value)) {
+    console.log("Initialization canceled.");
+    process.exit(0);
+  }
+
+  return createOk(response.value as boolean);
 }

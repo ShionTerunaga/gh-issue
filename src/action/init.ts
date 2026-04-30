@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { copy } from "../helper/copy";
 import { confirmInit, Language, selectIssueTemplateTypes, selectLanguages } from "../command/init";
+import { spinner } from "@clack/prompts";
 
 interface IssueTemplateMaterial {
   lang: Language;
@@ -63,6 +64,9 @@ export async function initAction() {
   await mkdir(githubDir, { recursive: true });
   await mkdir(issueTemplateDir, { recursive: true });
 
+  const spin = spinner();
+
+  spin.start("Creating issue templates...");
   for (const template of templates) {
     const templatePath = join(issueTemplateDir, template.file);
 
@@ -72,9 +76,8 @@ export async function initAction() {
     }
 
     const templateDir = join(templateRoot, template.lang);
-    console.log(`Creating ${template.file}...\n`);
 
-    console.log(`Copying from ${join(templateDir, template.file)} to ${templatePath}...`);
+    spin.message(`Creating ${template.file}...`);
 
     const res = await copy(template.file, issueTemplateDir, {
       parents: false,
@@ -86,8 +89,8 @@ export async function initAction() {
       process.exit(1);
     }
 
-    console.log(`Created ${templatePath}\n`);
+    spin.message(`Created ${templatePath}\n`);
   }
 
-  console.log("All done!");
+  spin.stop("All done!");
 }

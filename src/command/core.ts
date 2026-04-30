@@ -25,6 +25,8 @@ export function createCommander() {
     //.option("-y, --yes", "skip prompts and use defaults")
     .action(initAction);
 
+  program.command("create").description("Create an issue template");
+
   return program;
 }
 
