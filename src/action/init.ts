@@ -1,9 +1,14 @@
-import { mkdir } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { copy } from "../helper/copy";
-import { confirmInit, Language, selectIssueTemplateTypes, selectLanguages } from "../command/init";
+import {
+  confirmInit,
+  Language,
+  selectIssueTemplateTypes,
+  selectLanguages,
+} from "../command/init";
 import { spinner } from "@clack/prompts";
 
 interface IssueTemplateMaterial {
@@ -58,6 +63,8 @@ export async function initAction() {
 
   const githubDir = join(process.cwd(), ".github");
   const issueTemplateDir = join(githubDir, "ISSUE_TEMPLATE");
+  const ghIssueDir = join(process.cwd(), ".gh-issue");
+  const ghIssueReadmePath = join(ghIssueDir, "README.md");
   const cliDir = dirname(fileURLToPath(import.meta.url));
   const templateRoot = join(cliDir, "template");
 
@@ -90,6 +97,18 @@ export async function initAction() {
     }
 
     spin.message(`Created ${templatePath}\n`);
+  }
+
+  await mkdir(ghIssueDir, { recursive: true });
+
+  if (!existsSync(ghIssueReadmePath)) {
+    await writeFile(
+      ghIssueReadmePath,
+      `# gh-issue
+
+This directory is managed by gh-issue.
+`,
+    );
   }
 
   spin.stop("All done!");

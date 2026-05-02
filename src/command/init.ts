@@ -1,6 +1,7 @@
 import { Result, resultUtility, type Option } from "ts-shared";
 import { createPromptError } from "../shared/error";
-import { confirm, isCancel, multiselect } from "@clack/prompts";
+import { confirm, isCancel } from "@clack/prompts";
+import { multiselectPrompts, type PromptOption } from "./common";
 
 type IssueTemplateType = "bug_report" | "feature_request";
 export type Language = "en" | "ja";
@@ -11,7 +12,7 @@ export interface InitOptions {
   yes: Option<boolean>;
 }
 
-const issueTemplateTypeChoices = [
+const issueTemplateTypeChoices: PromptOption<IssueTemplateType>[] = [
   {
     title: "Bug report",
     value: "bug_report",
@@ -24,7 +25,7 @@ const issueTemplateTypeChoices = [
   },
 ];
 
-const languageChoices = [
+const languageChoices: PromptOption<Language>[] = [
   {
     title: "English",
     value: "en",
@@ -38,51 +39,21 @@ const languageChoices = [
 ];
 
 export async function selectIssueTemplateTypes(): Promise<Result<IssueTemplateType[], Error>> {
-  const { checkPromiseReturn, createNg, createOk } = resultUtility;
-
-  const response = await checkPromiseReturn({
-    fn: async () =>
-      await multiselect({
-        message: "Select issue template types",
-        options: issueTemplateTypeChoices,
-      }),
-    err: (e) => createNg(createPromptError("Failed to select issue template types", e)),
+  return await multiselectPrompts({
+    message: "Select issue template types",
+    options: issueTemplateTypeChoices,
+    cancelMessage: "No template types selected. Canceled.",
+    errorMessage: "Failed to select issue template types",
   });
-
-  if (response.isErr) {
-    return response;
-  }
-
-  if (isCancel(response.value)) {
-    console.log("No template types selected. Canceled.");
-    process.exit(0);
-  }
-
-  return createOk(response.value as IssueTemplateType[]);
 }
 
 export async function selectLanguages(): Promise<Result<Language[], Error>> {
-  const { checkPromiseReturn, createNg, createOk } = resultUtility;
-
-  const response = await checkPromiseReturn({
-    fn: async () =>
-      await multiselect({
-        message: "Select template languages",
-        options: languageChoices,
-      }),
-    err: (e) => createNg(createPromptError("Failed to select template languages", e)),
+  return await multiselectPrompts({
+    message: "Select template languages",
+    options: languageChoices,
+    cancelMessage: "No languages selected. Canceled.",
+    errorMessage: "Failed to select template languages",
   });
-
-  if (response.isErr) {
-    return response;
-  }
-
-  if (isCancel(response.value)) {
-    console.log("No languages selected. Canceled.");
-    process.exit(0);
-  }
-
-  return createOk(response.value as Language[]);
 }
 
 export async function confirmInit(): Promise<Result<boolean, Error>> {
