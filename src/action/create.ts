@@ -33,12 +33,10 @@ export async function createIssueAction() {
     process.exit(1);
   }
 
-  const selectedMaterial: SelectMaterial[] = templateContents.value.map(
-    (tmp) => ({
-      name: tmp.name,
-      fileName: tmp.fileName,
-    }),
-  );
+  const selectedMaterial: SelectMaterial[] = templateContents.value.map((tmp) => ({
+    name: tmp.name,
+    fileName: tmp.fileName,
+  }));
 
   const selectedTemplate = await selectTemplate(selectedMaterial);
 
@@ -48,9 +46,7 @@ export async function createIssueAction() {
   }
 
   const foundTemplate = optionConversion(
-    templateContents.value.find(
-      (tmp) => tmp.fileName === selectedTemplate.value,
-    ),
+    templateContents.value.find((tmp) => tmp.fileName === selectedTemplate.value),
   );
 
   if (foundTemplate.isNone) {

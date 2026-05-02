@@ -10,13 +10,7 @@ import {
   type InferOutput,
 } from "valibot";
 
-export type ContentType =
-  | "markdown"
-  | "input"
-  | "textarea"
-  | "dropdown"
-  | "checkboxes"
-  | "upload";
+export type ContentType = "markdown" | "input" | "textarea" | "dropdown" | "checkboxes" | "upload";
 
 export const validationsSchema = object({
   required: optional(boolean()),

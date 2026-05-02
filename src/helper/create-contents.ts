@@ -45,7 +45,7 @@ export async function createContents(
 
       if (
         tmpBody.validations?.required &&
-        inputResult.value.trim().length === 0
+        (inputResult.value as string).trim().length === 0
       ) {
         return createNg(new Error("This field is required"));
       }
@@ -77,7 +77,7 @@ export async function createContents(
 
       if (
         tmpBody.validations?.required &&
-        textareaResult.value.trim().length === 0
+        (textareaResult.value as string).trim().length === 0
       ) {
         return createNg(new Error("This field is required"));
       }

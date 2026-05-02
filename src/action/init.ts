@@ -3,12 +3,7 @@ import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { copy } from "../helper/copy";
-import {
-  confirmInit,
-  Language,
-  selectIssueTemplateTypes,
-  selectLanguages,
-} from "../command/init";
+import { confirmInit, Language, selectIssueTemplateTypes, selectLanguages } from "../command/init";
 import { spinner } from "@clack/prompts";
 
 interface IssueTemplateMaterial {

@@ -16,9 +16,7 @@ export const onPromptState = (state: {
 };
 
 export function createCommander() {
-  const program = new Command()
-    .description("Create GitHub issue templates")
-    .version("0.0.0");
+  const program = new Command().description("Create GitHub issue templates").version("0.0.0");
 
   program
     .command("init")
@@ -28,10 +26,7 @@ export function createCommander() {
     //.option("-y, --yes", "skip prompts and use defaults")
     .action(initAction);
 
-  program
-    .command("create")
-    .description("Create an issue template")
-    .action(createIssueAction);
+  program.command("create").description("Create an issue template").action(createIssueAction);
 
   return program;
 }

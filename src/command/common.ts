@@ -141,9 +141,7 @@ export async function multiselectPrompts<T extends PromptValue>({
 }): Promise<Result<T[], Error>> {
   const { createNg, createOk, checkPromiseReturn } = resultUtility;
 
-  const initialValues = options
-    .filter((option) => option.selected)
-    .map((option) => option.value);
+  const initialValues = options.filter((option) => option.selected).map((option) => option.value);
 
   const result = await checkPromiseReturn({
     fn: async () =>
