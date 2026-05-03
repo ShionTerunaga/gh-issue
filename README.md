@@ -62,6 +62,8 @@ gh auth login
 If `gh` is not installed yet, install it first from the official GitHub CLI documentation:
 https://cli.github.com/
 
+Install: https://github.com/cli/cli#installation
+
 ```sh
 gh-issue send
 ```
