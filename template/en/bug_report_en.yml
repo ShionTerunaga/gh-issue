@@ -1,65 +1,72 @@
-name: Bug report
-description: |
-  Create an Issue to report a bug. Include reproduction steps, expected behavior,
-  actual behavior, and your environment in as much detail as possible.
-title: "[BUG] "
-labels: [bug]
-assignees: []
-
+name: Bug Report
+description: File a bug report.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+projects: ["octo-org/1", "octo-org/44"]
+assignees:
+  - octocat
+type: bug
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you for reporting a bug. Please fill in the sections below with as much detail as possible. More information makes it easier to reproduce and fix the issue.
+        Thank you for helping us by filing a bug report.
   - type: input
-    id: summary
+    id: contact
     attributes:
       label: Summary
-      description: |
-        Write a concise one-line summary of the bug.
-      placeholder: |
-        Example: "Build fails with TypeError in createApp"
+      description: Please describe the bug briefly.
+      placeholder: 'Example: "A build error occurred"'
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Details
+      description: Also tell us what you expected to happen.
+      placeholder: Please describe what happened
+      value: "When I ran the `pnpm build` command, a build error occurred."
     validations:
       required: true
-  - type: textarea
-    id: steps
+  - type: dropdown
+    id: version
     attributes:
-      label: Steps to reproduce
-      description: |
-        Write the exact steps needed to reproduce the bug.
-      placeholder: |
-        1. Clone the repository
-        2. Run `pnpm install`
-        3. Run `pnpm run build`
+      label: Version
+      description: What version of our software are you running?
+      options:
+        - 1.0.2 (Default)
+        - 1.0.3 (Edge)
+      default: 0
     validations:
       required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: Browser where the issue occurred
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
   - type: textarea
-    id: expected
+    id: logs
     attributes:
-      label: Expected behavior
-      description: |
-        Describe what you expected to happen.
-      placeholder: |
-        Example: "The project builds successfully"
-  - type: textarea
-    id: actual
+      label: Relevant log output
+      description: If you have any relevant logs, please paste them here. They will be automatically formatted as code, so backticks are not needed.
+      render: shell
+  - type: checkboxes
+    id: terms
     attributes:
-      label: Actual behavior
-      description: |
-        Describe what actually happened. Include error messages or stack traces if available.
-      placeholder: |
-        Paste error output or stack traces here.
-  - type: input
-    id: environment
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com).
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+  - type: upload
+    id: screenshots
     attributes:
-      label: Environment
-      description: |
-        Include relevant environment details such as OS, Node.js version, and pnpm version.
-      placeholder: |
-        Example: "macOS 14.0, Node 20.10.0, pnpm 8.0.0"
-  - type: textarea
-    id: additional
-    attributes:
-      label: Additional context
-      description: |
-        Add anything else that may help, such as logs, screenshots, or links to failing CI runs.
+      label: Upload screenshots
+      description: If needed, add screenshots that help explain the issue.
+    validations:
+      required: false

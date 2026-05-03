@@ -1,67 +1,74 @@
 name: バグ報告
-description: |
-  バグを報告するための Issue を作成します。再現手順、期待した動作、
-  実際の動作、利用環境をできるだけ詳しく記載してください。
-title: "[BUG] "
-labels: [bug]
-assignees: []
-
+description: バグ報告を作成します。
+title: "[Bug]: "
+labels: ["bug", "triage"]
+projects: ["octo-org/1", "octo-org/44"]
+assignees:
+  - octocat
+type: bug
 body:
   - type: markdown
     attributes:
       value: |
-        バグ報告ありがとうございます。以下の項目をできるだけ詳しく記入してください。情報が多いほど、再現と修正がしやすくなります。
+        バグ報告にご協力いただきありがとうございます。
   - type: input
-    id: summary
+    id: contact
     attributes:
       label: 概要
-      description: |
-        バグの内容を 1 行で簡潔に書いてください。
+      description: バグの概要に記述してください。
       placeholder: |
-        例: "createApp で TypeError が発生してビルドに失敗する"
+        例: "ビルドエラーが起こった"
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 詳細
+      description: あわせて、どうなることを期待していたかも教えてください。
+      placeholder: |
+        発生した内容を記入してください
+      value: "pnpm build コマンドを実行したところ、ビルドエラーが発生しました。"
     validations:
       required: true
-  - type: textarea
-    id: steps
+  - type: dropdown
+    id: version
     attributes:
-      label: 再現手順
-      description: |
-        バグを再現するための具体的な手順を書いてください。
-      placeholder: |
-        1. リポジトリをクローンする
-        2. `pnpm install` を実行する
-        3. `pnpm run build` を実行する
+      label: バージョン
+      description: 利用中のソフトウェアのバージョンを選択してください。
+      options:
+        - 1.0.2 (Default)
+        - 1.0.3 (Edge)
+      default: 0
     validations:
       required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: 問題が発生したブラウザ
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
   - type: textarea
-    id: expected
+    id: logs
     attributes:
-      label: 期待した動作
-      description: |
-        本来どうなることを期待していたかを書いてください。
-      placeholder: |
-        例: "プロジェクトが正常にビルドされる"
-  - type: textarea
-    id: actual
+      label: 関連するログ出力
+      description: 関連するログがあれば貼り付けてください。自動でコード形式になるため、バッククォートは不要です。
+      render: shell
+  - type: checkboxes
+    id: terms
     attributes:
-      label: 実際の動作
-      description: |
-        実際に起きたことを書いてください。エラーメッセージやスタックトレースもあれば記載してください。
-      placeholder: |
-        エラー出力やスタックトレースをここに貼ってください。
-  - type: input
-    id: environment
+      label: 行動規範
+      description: この Issue を送信することで、[行動規範](https://example.com) に従うことに同意したものとみなされます。
+      options:
+        - label: このプロジェクトの行動規範に従うことに同意します
+          required: true
+  - type: upload
+    id: screenshots
     attributes:
-      label: 環境
-      description: |
-        OS、Node.js のバージョン、pnpm
-        のバージョンなど、関連する環境情報を記載してください。
-      placeholder: |
-        例: "macOS 14.0, Node 20.10.0, pnpm 8.0.0"
-  - type: textarea
-    id: additional
-    attributes:
-      label: 補足情報
-      description: |
-        そのほか参考になりそうな情報があれば書いてください。ログ、スクリーンショット、失敗した
-        CI へのリンクなど。
+      label: スクリーンショットをアップロード
+      description: 必要に応じて、問題の説明に役立つスクリーンショットを追加してください。
+    validations:
+      required: false
