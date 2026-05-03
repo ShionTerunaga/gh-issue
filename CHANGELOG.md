@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.3.1
+
+### Patch Changes
+
+- [#15](https://github.com/ShionTerunaga/gh-issue/pull/15) [`e222d71`](https://github.com/ShionTerunaga/gh-issue/commit/e222d71bafa96d379b6276ba4113818eee9e90ee) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - change readme
+
 ## 0.3.0
 
 ### Minor Changes
