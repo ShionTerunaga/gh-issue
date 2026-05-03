@@ -1,15 +1,10 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync, rmSync } from "node:fs";
+import { rmSync } from "node:fs";
 import { join } from "node:path";
+import { parseDraftIssue, type DraftIssue } from "../src/helper/draft-issue";
 
 const DRAFTS_DIR = ".gh-issue";
 const ZERO_SHA = "0000000000000000000000000000000000000000";
-
-interface DraftIssue {
-  filePath: string;
-  title: string;
-  body: string;
-}
 
 function getRequiredEnv(name: string): string {
   const value = process.env[name];
@@ -50,28 +45,6 @@ function getChangedDraftFiles(): string[] {
     .map((line) => line.trim())
     .filter((line) => line.endsWith(".md"))
     .filter((line) => line !== `${DRAFTS_DIR}/README.md`);
-}
-
-function parseDraftIssue(filePath: string): DraftIssue {
-  const raw = readFileSync(join(process.cwd(), filePath), "utf8");
-  const frontMatterMatch = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-
-  if (!frontMatterMatch) {
-    throw new Error(`Missing front matter in ${filePath}`);
-  }
-
-  const [, frontMatter, markdownBody] = frontMatterMatch;
-  const titleMatch = frontMatter.match(/^title:\s*(.+)$/m);
-
-  if (!titleMatch) {
-    throw new Error(`Missing title in front matter: ${filePath}`);
-  }
-
-  return {
-    filePath,
-    title: titleMatch[1].trim(),
-    body: markdownBody.trim(),
-  };
 }
 
 async function createIssue(repository: string, token: string, issue: DraftIssue) {
