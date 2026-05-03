@@ -53,6 +53,15 @@ The command will:
 
 To create a GitHub Issue from a Markdown draft under `.gh-issue/`, run:
 
+Before using this command, install GitHub CLI and sign in:
+
+```sh
+gh auth login
+```
+
+If `gh` is not installed yet, install it first from the official GitHub CLI documentation:
+https://cli.github.com/
+
 ```sh
 gh-issue send
 ```
