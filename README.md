@@ -30,7 +30,26 @@ Generated files are written to:
 .github/ISSUE_TEMPLATE/
 ```
 
+The command also creates:
+
+```text
+.gh-issue/README.md
+```
+
 Existing template files are skipped instead of overwritten.
+
+To create an issue draft from one of the installed templates, run:
+
+```sh
+gh-issue create
+```
+
+The command will:
+
+- Prompt you to choose an issue template
+- Prompt you for the issue title
+- Prompt you for each template field
+- Save the result as a Markdown draft under `.gh-issue/`
 
 ## Draft issue automation
 
@@ -42,6 +61,9 @@ If you commit Markdown draft issues under:
 
 and push them to `main`, the GitHub Actions workflow at `.github/workflows/create-issue-from-draft.yml`
 will create GitHub Issues automatically.
+
+After an issue is created successfully, the processed draft file is deleted and the workflow
+commits that deletion back to `main`.
 
 Each draft file must use this format:
 
