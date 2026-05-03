@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.3.0
+
+### Minor Changes
+
+- [#13](https://github.com/ShionTerunaga/gh-issue/pull/13) [`56c6ca3`](https://github.com/ShionTerunaga/gh-issue/commit/56c6ca39862ffb00d9f28cab20d1c6c87ec15fcb) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - create send command
+
 ## 0.2.0
 
 ### Minor Changes
