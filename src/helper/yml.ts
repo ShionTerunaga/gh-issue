@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { basename, join } from "node:path";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { load } from "js-yaml";
 import { safeParse } from "valibot";
 import { IssueTemplate, issueTemplateSchema } from "./issue-tyepe";

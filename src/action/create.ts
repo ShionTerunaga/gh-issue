@@ -20,9 +20,7 @@ export async function createIssueAction() {
   const ghIssueDir = join(process.cwd(), ".gh-issue");
 
   if (!existsSync(ghIssueDir)) {
-    console.error(
-      ".gh-issue directory does not exist. Please run `gh-issue init` first.",
-    );
+    console.error(".gh-issue directory does not exist. Please run `gh-issue init` first.");
     process.exit(1);
   }
 
@@ -45,12 +43,10 @@ export async function createIssueAction() {
     process.exit(1);
   }
 
-  const selectedMaterial: SelectMaterial[] = templateContents.value.map(
-    (tmp) => ({
-      name: tmp.name,
-      fileName: tmp.fileName,
-    }),
-  );
+  const selectedMaterial: SelectMaterial[] = templateContents.value.map((tmp) => ({
+    name: tmp.name,
+    fileName: tmp.fileName,
+  }));
 
   const selectedTemplate = await selectTemplate(selectedMaterial);
 
@@ -60,9 +56,7 @@ export async function createIssueAction() {
   }
 
   const foundTemplate = optionConversion(
-    templateContents.value.find(
-      (tmp) => tmp.fileName === selectedTemplate.value,
-    ),
+    templateContents.value.find((tmp) => tmp.fileName === selectedTemplate.value),
   );
 
   if (foundTemplate.isNone) {
