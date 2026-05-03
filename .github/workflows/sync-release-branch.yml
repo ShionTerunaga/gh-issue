@@ -106,6 +106,7 @@ jobs:
 
           git rm -r -f --ignore-unmatch .
           cp -R "$release_dir"/. .
+          rm -rf node_modules
 
       - name: Sync release branch
         id: sync-release
