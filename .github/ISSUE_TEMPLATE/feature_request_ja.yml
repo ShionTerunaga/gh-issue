@@ -1,7 +1,7 @@
 name: 機能要望
 description: |
-  新しい機能や改善案を提案するための issue を作成します。背景、ユースケース、
-  代替案などを記載してください。
+  新機能や改善案を提案するための Issue を作成します。背景、ユースケース、
+  代替案があれば記載してください。
 title: "[FEATURE] "
 labels: [enhancement]
 assignees: []
@@ -10,12 +10,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        改善提案ありがとうございます。解決したい課題と、その機能がどのように役立つかを記載してください。
+        改善案の提案ありがとうございます。解決したい課題と、その機能がどのように役立つかを教えてください。
   - type: input
     id: summary
     attributes:
       label: 概要
-      description: 要望する機能を一文で簡潔に書いてください。
+      description: 要望する機能を 1 行で簡潔に書いてください。
       placeholder: |
         例: "プロンプトをスキップする CLI オプションを追加したい"
     validations:
@@ -23,17 +23,18 @@ body:
   - type: textarea
     id: motivation
     attributes:
-      label: 背景・ユーザーストーリー
+      label: 背景とユーザーストーリー
       description: どんな課題があり、なぜこの機能が必要なのかを書いてください。
       placeholder: |
-        ユーザーとして、CI で利用するために対話なしでジェネレーターを実行したい。
+        ユーザーとして、対話なしでジェネレーターを実行できるようにしたいです。
+        そうすることで CI から利用しやすくなります。
   - type: textarea
     id: proposed
     attributes:
       label: 提案する解決策
-      description: 実装案や API の変更案があれば記載してください。
+      description: 想定している実装や API 変更があれば書いてください。
       placeholder: |
-        例: "`-n/--name` と `-f/--framework` オプションを CLI に追加する"
+        例: "CLI に -n/--name と -f/--framework オプションを追加する"
   - type: textarea
     id: alternatives
     attributes:
@@ -42,12 +43,12 @@ body:
   - type: input
     id: impact
     attributes:
-      label: 影響範囲
-      description: 後方互換性、テスト、テンプレートなど、影響しそうな箇所を書いてください。
+      label: 想定される影響範囲
+      description: 後方互換性、テスト、テンプレートへの影響など、関係しそうな点を書いてください。
       placeholder: |
-        例: "後方互換性あり。オプション追加のみ"
+        例: "後方互換あり。オプション追加のみ"
   - type: textarea
     id: additional
     attributes:
       label: 補足情報
-      description: 関連リンク、モックアップ、そのほか補足があれば記載してください。
+      description: 関連リンク、モック、補足メモなどがあれば記載してください。

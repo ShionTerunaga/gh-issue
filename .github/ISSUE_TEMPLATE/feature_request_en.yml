@@ -1,0 +1,54 @@
+name: Feature Request
+description: |
+  Create an Issue to suggest a new feature or improvement. Include the
+  background, use case, and alternatives if you have considered any.
+title: "[FEATURE] "
+labels: [enhancement]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an improvement. Tell us what problem you want to solve and how this feature would help.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: Write a concise one-line summary of the requested feature.
+      placeholder: |
+        Example: "Add a CLI option to skip prompts"
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Background and user story
+      description: Describe the problem and why this feature is needed.
+      placeholder: |
+        As a user, I want to run the generator without prompts.
+        This would make it easier to use from CI.
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed solution
+      description: Describe the implementation or API changes you have in mind.
+      placeholder: |
+        Example: "Add -n/--name and -f/--framework options to the CLI"
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Briefly describe any other approaches you considered.
+  - type: input
+    id: impact
+    attributes:
+      label: Expected impact
+      description: Note anything that may be affected, such as compatibility, tests, or templates.
+      placeholder: |
+        Example: "Backward compatible. Adds options only"
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add related links, mockups, or notes if you have any.
