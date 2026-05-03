@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { optionUtility, resultUtility } from "ts-shared";
 import { findTemplates } from "../helper/find-template";
 import { ymlParse } from "../helper/yml";
@@ -5,6 +7,7 @@ import { selectTemplate } from "../command/create";
 import { bold, green } from "picocolors";
 import { textPrompts } from "../command/common";
 import { createContents, IssueContents } from "../helper/create-contents";
+import { writeIssueMarkdown } from "../helper/write-issue-markdown";
 
 export interface SelectMaterial {
   name: string;
@@ -14,6 +17,15 @@ export interface SelectMaterial {
 export async function createIssueAction() {
   const { checkResultReturn, createNg } = resultUtility;
   const { optionConversion } = optionUtility;
+  const ghIssueDir = join(process.cwd(), ".gh-issue");
+
+  if (!existsSync(ghIssueDir)) {
+    console.error(
+      ".gh-issue directory does not exist. Please run `gh-issue init` first.",
+    );
+    process.exit(1);
+  }
+
   const findTemplateResult = findTemplates();
 
   const issueContents: IssueContents[] = [];
@@ -33,10 +45,12 @@ export async function createIssueAction() {
     process.exit(1);
   }
 
-  const selectedMaterial: SelectMaterial[] = templateContents.value.map((tmp) => ({
-    name: tmp.name,
-    fileName: tmp.fileName,
-  }));
+  const selectedMaterial: SelectMaterial[] = templateContents.value.map(
+    (tmp) => ({
+      name: tmp.name,
+      fileName: tmp.fileName,
+    }),
+  );
 
   const selectedTemplate = await selectTemplate(selectedMaterial);
 
@@ -46,7 +60,9 @@ export async function createIssueAction() {
   }
 
   const foundTemplate = optionConversion(
-    templateContents.value.find((tmp) => tmp.fileName === selectedTemplate.value),
+    templateContents.value.find(
+      (tmp) => tmp.fileName === selectedTemplate.value,
+    ),
   );
 
   if (foundTemplate.isNone) {
@@ -90,5 +106,12 @@ export async function createIssueAction() {
     }
   }
 
-  console.log(issueContents);
+  const writeMarkdownResult = await writeIssueMarkdown(issueContents);
+
+  if (writeMarkdownResult.isErr) {
+    console.error(`Error: ${writeMarkdownResult.err.message}`);
+    process.exit(1);
+  }
+
+  console.log(`Saved issue draft: ${writeMarkdownResult.value}`);
 }
