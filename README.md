@@ -31,3 +31,26 @@ Generated files are written to:
 ```
 
 Existing template files are skipped instead of overwritten.
+
+## Draft issue automation
+
+If you commit Markdown draft issues under:
+
+```text
+.gh-issue/
+```
+
+and push them to `main`, the GitHub Actions workflow at `.github/workflows/create-issue-from-draft.yml`
+will create GitHub Issues automatically.
+
+Each draft file must use this format:
+
+```md
+---
+title: [BUG] Build fails on CI
+---
+
+## Summary
+
+The build fails when running the release workflow.
+```

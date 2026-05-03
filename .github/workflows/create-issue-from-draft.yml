@@ -1,0 +1,50 @@
+name: Create Issue From Draft
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".gh-issue/**/*.md"
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  create_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Create issues from changed drafts
+        env:
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node --experimental-strip-types scripts/create-issues-from-drafts.ts
+
+      - name: Configure git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit removed drafts
+        run: |
+          if git diff --quiet -- .gh-issue; then
+            echo "No processed drafts to commit."
+            exit 0
+          fi
+
+          git add .gh-issue
+          git commit -m "chore: remove processed issue drafts"
+          git push

@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { type InitialReturnValue } from "prompts";
 import { initAction } from "../action/init";
+import { createIssueAction } from "../action/create";
 
 export const onPromptState = (state: {
   value: InitialReturnValue;
@@ -24,6 +25,8 @@ export function createCommander() {
     //.option("-l, --lang <language>", "template language: en or ja")
     //.option("-y, --yes", "skip prompts and use defaults")
     .action(initAction);
+
+  program.command("create").description("Create an issue template").action(createIssueAction);
 
   return program;
 }

@@ -1,7 +1,7 @@
 name: バグ報告
 description: |
-  バグを報告するための issue を作成します。再現手順、期待する動作、
-  実際の動作、環境情報をできるだけ詳しく記入してください。
+  バグを報告するための Issue を作成します。再現手順、期待した動作、
+  実際の動作、利用環境をできるだけ詳しく記載してください。
 title: "[BUG] "
 labels: [bug]
 assignees: []
@@ -15,45 +15,53 @@ body:
     id: summary
     attributes:
       label: 概要
-      description: バグの内容を一文で簡潔に書いてください。
+      description: |
+        バグの内容を 1 行で簡潔に書いてください。
       placeholder: |
-        例: "createApp 実行時に TypeError が発生する"
+        例: "createApp で TypeError が発生してビルドに失敗する"
     validations:
       required: true
   - type: textarea
     id: steps
     attributes:
       label: 再現手順
-      description: バグを再現するための手順を正確に記載してください。
+      description: |
+        バグを再現するための具体的な手順を書いてください。
       placeholder: |
-        1. リポジトリを clone する
+        1. リポジトリをクローンする
         2. `pnpm install` を実行する
-        3. `pnpm run test:next-app` を実行する
+        3. `pnpm run build` を実行する
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: 期待する動作
-      description: 本来どのような結果になるべきかを書いてください。
+      label: 期待した動作
+      description: |
+        本来どうなることを期待していたかを書いてください。
       placeholder: |
-        例: "プロジェクトが正常にビルドされ、テストが通る"
+        例: "プロジェクトが正常にビルドされる"
   - type: textarea
     id: actual
     attributes:
       label: 実際の動作
-      description: 実際に起きたことを、エラーメッセージやスタックトレースを含めて記載してください。
+      description: |
+        実際に起きたことを書いてください。エラーメッセージやスタックトレースもあれば記載してください。
       placeholder: |
-        エラーログやスタックトレースをここに貼ってください。
+        エラー出力やスタックトレースをここに貼ってください。
   - type: input
     id: environment
     attributes:
-      label: 環境情報
-      description: OS、Node.js の version、pnpm の version など、関連する環境情報を書いてください。
+      label: 環境
+      description: |
+        OS、Node.js のバージョン、pnpm
+        のバージョンなど、関連する環境情報を記載してください。
       placeholder: |
         例: "macOS 14.0, Node 20.10.0, pnpm 8.0.0"
   - type: textarea
     id: additional
     attributes:
       label: 補足情報
-      description: そのほか役立ちそうな情報があれば記載してください。ログ、スクリーンショット、失敗した CI へのリンクなども歓迎です。
+      description: |
+        そのほか参考になりそうな情報があれば書いてください。ログ、スクリーンショット、失敗した
+        CI へのリンクなど。
