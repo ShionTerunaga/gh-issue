@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.3.2
+
+### Patch Changes
+
+- [#18](https://github.com/ShionTerunaga/gh-issue/pull/18) [`15ed45a`](https://github.com/ShionTerunaga/gh-issue/commit/15ed45aba74fb89ddcbe9f50e1611daedda029db) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - change template
+
 ## 0.3.1
 
 ### Patch Changes
