@@ -6,19 +6,13 @@ A command line tool for generating GitHub Issue templates.
 
 ## Installation
 
-Global install:
-
-```sh
-npm install -g github:ShionTerunaga/gh-issue#release
-```
-
-Local install:
+Install locally:
 
 ```sh
 npm install github:ShionTerunaga/gh-issue#release
 ```
 
-If you do not install it globally, add scripts to your `package.json`:
+Add scripts to your `package.json`:
 
 ```json
 {
@@ -33,14 +27,6 @@ If you do not install it globally, add scripts to your `package.json`:
 ## Usage
 
 Run the initializer in the repository where you want to create issue templates:
-
-With global install (`-g`):
-
-```sh
-gh-issue init
-```
-
-Without global install:
 
 ```sh
 npm run gh-init
@@ -70,14 +56,6 @@ The generated YAML files are starter templates. Review and edit them to match yo
 
 To create an issue draft from one of the installed templates, run:
 
-With global install (`-g`):
-
-```sh
-gh-issue create
-```
-
-Without global install:
-
 ```sh
 npm run gh-create
 ```
@@ -101,14 +79,6 @@ If `gh` is not installed yet, install it first from the official GitHub CLI docu
 https://cli.github.com/
 
 Install: https://github.com/cli/cli#installation
-
-With global install (`-g`):
-
-```sh
-gh-issue send
-```
-
-Without global install:
 
 ```sh
 npm run gh-send
