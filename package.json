@@ -1,6 +1,6 @@
 {
   "name": "gh-issue",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A command line tool for GitHub issues.",
   "homepage": "https://github.com/ShionTerunaga/gh-issue#readme",
   "bugs": {

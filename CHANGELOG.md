@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.3.3
+
+### Patch Changes
+
+- [`d879d72`](https://github.com/ShionTerunaga/gh-issue/commit/d879d72229cd796c04fb25244923ebf182c098ae) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Remove the conditions for `main` to run
+
 ## 0.3.2
 
 ### Patch Changes
