@@ -66,6 +66,8 @@ The command also creates:
 
 Existing template files are skipped instead of overwritten.
 
+The generated YAML files are starter templates. Review and edit them to match your project's issue flow, labels, and guidance before using them in production.
+
 To create an issue draft from one of the installed templates, run:
 
 With global install (`-g`):
