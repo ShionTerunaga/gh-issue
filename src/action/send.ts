@@ -28,7 +28,7 @@ function createIssueWithGh(issue: { title: string; body: string }) {
 
 export async function sendIssueAction(options: { all?: boolean } = {}) {
   const isAll = options.all || process.env.npm_config_all === "true";
-  const { checkResultReturn, checkResultVoid, createNg } = resultUtility;
+  const { checkResultReturn, checkResultVoid, createNg, createOk } = resultUtility;
   const draftFilesResult = await findDraftIssues();
 
   if (draftFilesResult.isErr) {
