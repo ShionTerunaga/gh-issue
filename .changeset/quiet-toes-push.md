@@ -2,4 +2,4 @@
 "gh-issue": minor
 ---
 
-added --all option
+Add the `--all` option
