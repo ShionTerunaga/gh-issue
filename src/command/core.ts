@@ -25,7 +25,11 @@ export function createCommander() {
     .action(initAction);
 
   program.command("create").description("Create an issue template").action(createIssueAction);
-  program.command("send").description("Send an issue draft to GitHub").action(sendIssueAction);
+  program
+    .command("send")
+    .description("Send an issue draft to GitHub")
+    .option("--all", "Send all issue drafts without selection prompt")
+    .action((options) => sendIssueAction(options));
 
   return program;
 }

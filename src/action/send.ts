@@ -26,7 +26,8 @@ function createIssueWithGh(issue: { title: string; body: string }) {
   return runGh(["issue", "create", "--title", issue.title, "--body", issue.body]);
 }
 
-export async function sendIssueAction() {
+export async function sendIssueAction(options: { all?: boolean } = {}) {
+  const isAll = options.all || process.env.npm_config_all === "true";
   const { checkResultReturn, checkResultVoid, createNg } = resultUtility;
   const draftFilesResult = await findDraftIssues();
 
@@ -40,16 +41,24 @@ export async function sendIssueAction() {
     process.exit(1);
   }
 
-  const selectedDrafts = await selectDraftIssues(draftFilesResult.value);
+  let draftsToSend: string[];
 
-  if (selectedDrafts.isErr) {
-    console.error(`Error: ${selectedDrafts.err.message}`);
-    process.exit(1);
-  }
+  if (isAll) {
+    draftsToSend = draftFilesResult.value;
+  } else {
+    const selectedDrafts = await selectDraftIssues(draftFilesResult.value);
 
-  if (selectedDrafts.value.length === 0) {
-    console.error("No issue drafts selected.");
-    process.exit(1);
+    if (selectedDrafts.isErr) {
+      console.error(`Error: ${selectedDrafts.err.message}`);
+      process.exit(1);
+    }
+
+    if (selectedDrafts.value.length === 0) {
+      console.error("No issue drafts selected.");
+      process.exit(1);
+    }
+
+    draftsToSend = selectedDrafts.value;
   }
 
   const authResult = checkResultVoid({
@@ -88,7 +97,7 @@ export async function sendIssueAction() {
 
   spin.start("Sending issue drafts...");
 
-  for (const selectedDraft of selectedDrafts.value) {
+  for (const selectedDraft of draftsToSend) {
     spin.message(`Sending ${selectedDraft}...`);
 
     const issue = parseDraftIssue(selectedDraft);
