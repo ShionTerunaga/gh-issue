@@ -97,7 +97,7 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
 
   spin.start("Sending issue drafts...");
 
-  for (const selectedDraft of draftsToSend) {
+  for (const selectedDraft of selectedIssues) {
     spin.message(`Sending ${selectedDraft}...`);
 
     const issue = parseDraftIssue(selectedDraft);
