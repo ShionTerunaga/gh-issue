@@ -1,4 +1,4 @@
-# gh-issue
+# Similar to `gh issue -T “TEMPMLATE”`
 
 A command line tool for generating GitHub Issue templates.
 
