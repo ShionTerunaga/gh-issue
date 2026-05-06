@@ -5,7 +5,6 @@ labels: ["bug", "triage"]
 projects: ["octo-org/1", "octo-org/44"]
 assignees:
   - octocat
-type: bug
 body:
   - type: markdown
     attributes:
@@ -63,10 +62,3 @@ body:
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true
-  - type: upload
-    id: screenshots
-    attributes:
-      label: Upload screenshots
-      description: If needed, add screenshots that help explain the issue.
-    validations:
-      required: false

@@ -5,7 +5,6 @@ labels: ["bug", "triage"]
 projects: ["octo-org/1", "octo-org/44"]
 assignees:
   - octocat
-type: bug
 body:
   - type: markdown
     attributes:
@@ -65,10 +64,3 @@ body:
       options:
         - label: このプロジェクトの行動規範に従うことに同意します
           required: true
-  - type: upload
-    id: screenshots
-    attributes:
-      label: スクリーンショットをアップロード
-      description: 必要に応じて、問題の説明に役立つスクリーンショットを追加してください。
-    validations:
-      required: false
