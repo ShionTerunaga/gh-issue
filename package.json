@@ -28,6 +28,7 @@
   },
   "scripts": {
     "build": "vite build && pnpm copy:template",
+    "start": "pnpm build && node dist/index.mjs",
     "changeset": "changeset",
     "copy:template": "node --experimental-strip-types scripts/copy-template.ts",
     "test": "vitest run",

@@ -1,6 +1,6 @@
 import { Result, resultUtility, type Option } from "ts-shared";
 import { createPromptError } from "../shared/error";
-import { confirm, isCancel } from "@clack/prompts";
+import { cancel, confirm, isCancel } from "@clack/prompts";
 import { multiselectPrompts, type PromptOption } from "./common";
 
 type IssueTemplateType = "bug_report" | "feature_request";
@@ -72,7 +72,7 @@ export async function confirmInit(): Promise<Result<boolean, Error>> {
   }
 
   if (isCancel(response.value)) {
-    console.log("Initialization canceled.");
+    cancel("Initialization canceled.");
     process.exit(0);
   }
 

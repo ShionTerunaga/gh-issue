@@ -9,6 +9,7 @@ import {
   textPrompts,
 } from "../command/common";
 import { parseCheckboxesValue } from "./checkboxes-parser";
+import { log } from "@clack/prompts";
 
 export interface IssueContents {
   title: string;
@@ -22,15 +23,15 @@ export async function createContents(
   const { createNone, createSome } = optionUtility;
   switch (tmpBody.type) {
     case "markdown": {
-      console.log(blue(tmpBody.attributes.value));
+      log.message(blue(tmpBody.attributes.value));
 
       return createOk(createNone());
     }
     case "input": {
-      console.log(
+      log.message(
         `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      console.log(blue(tmpBody.attributes.description || "No description") + "\n");
+      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
       const inputResult = await textPrompts({
         message: tmpBody.attributes.label,
@@ -54,10 +55,10 @@ export async function createContents(
     }
 
     case "textarea": {
-      console.log(
+      log.message(
         `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      console.log(blue(tmpBody.attributes.description || "No description") + "\n");
+      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
       const textareaResult = await multilineTextPrompts({
         message: tmpBody.attributes.label,
@@ -80,10 +81,10 @@ export async function createContents(
       );
     }
     case "checkboxes": {
-      console.log(
+      log.message(
         `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      console.log(blue(tmpBody.attributes.description || "No description") + "\n");
+      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
       const checkList: PromptOption<string>[] = tmpBody.attributes.options.map((option) => ({
         title: option.label,
@@ -122,10 +123,10 @@ export async function createContents(
     }
 
     case "dropdown": {
-      console.log(
+      log.message(
         `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      console.log(blue(tmpBody.attributes.description || "No description") + "\n");
+      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
       const dropdownOptions: PromptOption<string>[] = tmpBody.attributes.options.map(
         (option, index) => ({
@@ -156,12 +157,12 @@ export async function createContents(
       );
     }
     case "upload": {
-      console.log(
+      log.message(
         `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      console.log(blue(tmpBody.attributes.description || "No description") + "\n");
+      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
-      console.log(blue("File upload is not supported in this version") + "\n");
+      log.message(blue("File upload is not supported in this version") + "\n");
 
       return createOk(createNone());
     }
