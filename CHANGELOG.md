@@ -1,5 +1,15 @@
 # gh-issue
 
+## 0.4.0
+
+### Minor Changes
+
+- [#31](https://github.com/ShionTerunaga/gh-issue/pull/31) [`969fc40`](https://github.com/ShionTerunaga/gh-issue/commit/969fc402c212d0fbea0f2ee2b4cded8dd9b3f82f) Thanks [@laserbeam2045](https://github.com/laserbeam2045)! - Add the `--all` option
+
+### Patch Changes
+
+- [`dfb172d`](https://github.com/ShionTerunaga/gh-issue/commit/dfb172d45c46f6ed0137502b52c27c5b11d3bc25) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Fix template
+
 ## 0.3.3
 
 ### Patch Changes
