@@ -31,9 +31,7 @@ export async function createContents(
       log.message(
         `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(
-        blue(tmpBody.attributes.description || "No description") + "\n",
-      );
+      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
       const inputResult = await textPrompts({
         message: tmpBody.attributes.label,
@@ -44,10 +42,7 @@ export async function createContents(
         return createNg(inputResult.err);
       }
 
-      if (
-        tmpBody.validations?.required &&
-        (inputResult.value as string).trim().length === 0
-      ) {
+      if (tmpBody.validations?.required && (inputResult.value as string).trim().length === 0) {
         return createNg(new Error("This field is required"));
       }
 
@@ -63,9 +58,7 @@ export async function createContents(
       log.message(
         `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(
-        blue(tmpBody.attributes.description || "No description") + "\n",
-      );
+      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
       const textareaResult = await multilineTextPrompts({
         message: tmpBody.attributes.label,
@@ -76,10 +69,7 @@ export async function createContents(
         return createNg(textareaResult.err);
       }
 
-      if (
-        tmpBody.validations?.required &&
-        (textareaResult.value as string).trim().length === 0
-      ) {
+      if (tmpBody.validations?.required && (textareaResult.value as string).trim().length === 0) {
         return createNg(new Error("This field is required"));
       }
 
@@ -94,17 +84,13 @@ export async function createContents(
       log.message(
         `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(
-        blue(tmpBody.attributes.description || "No description") + "\n",
-      );
+      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
-      const checkList: PromptOption<string>[] = tmpBody.attributes.options.map(
-        (option) => ({
-          title: option.label,
-          value: option.label,
-          selected: option.required || false,
-        }),
-      );
+      const checkList: PromptOption<string>[] = tmpBody.attributes.options.map((option) => ({
+        title: option.label,
+        value: option.label,
+        selected: option.required || false,
+      }));
 
       const checkboxesResult = await multiselectPrompts({
         message: tmpBody.attributes.label,
@@ -115,18 +101,13 @@ export async function createContents(
         return createNg(checkboxesResult.err);
       }
 
-      if (
-        tmpBody.validations?.required &&
-        checkboxesResult.value.length === 0
-      ) {
+      if (tmpBody.validations?.required && checkboxesResult.value.length === 0) {
         return createNg(new Error("At least one option must be selected"));
       }
 
       for (const option of tmpBody.attributes.options) {
         if (option.required && !checkboxesResult.value.includes(option.label)) {
-          return createNg(
-            new Error(`The option "${option.label}" is required`),
-          );
+          return createNg(new Error(`The option "${option.label}" is required`));
         }
       }
 
@@ -145,16 +126,15 @@ export async function createContents(
       log.message(
         `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(
-        blue(tmpBody.attributes.description || "No description") + "\n",
-      );
+      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
-      const dropdownOptions: PromptOption<string>[] =
-        tmpBody.attributes.options.map((option, index) => ({
+      const dropdownOptions: PromptOption<string>[] = tmpBody.attributes.options.map(
+        (option, index) => ({
           title: option,
           value: option,
           selected: tmpBody.attributes.default === index,
-        }));
+        }),
+      );
 
       const dropdownResult = await selectPrompts({
         message: tmpBody.attributes.label,
@@ -180,9 +160,7 @@ export async function createContents(
       log.message(
         `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(
-        blue(tmpBody.attributes.description || "No description") + "\n",
-      );
+      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
       log.message(blue("File upload is not supported in this version") + "\n");
 
@@ -190,8 +168,6 @@ export async function createContents(
     }
 
     default:
-      return createNg(
-        new Error(`Unsupported content type: ${(tmpBody as any).type}`),
-      );
+      return createNg(new Error(`Unsupported content type: ${(tmpBody as any).type}`));
   }
 }

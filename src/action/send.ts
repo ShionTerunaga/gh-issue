@@ -19,31 +19,16 @@ function verifyGhAuth() {
 }
 
 function resolveRepository() {
-  return runGh([
-    "repo",
-    "view",
-    "--json",
-    "nameWithOwner",
-    "--jq",
-    ".nameWithOwner",
-  ]);
+  return runGh(["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]);
 }
 
 function createIssueWithGh(issue: { title: string; body: string }) {
-  return runGh([
-    "issue",
-    "create",
-    "--title",
-    issue.title,
-    "--body",
-    issue.body,
-  ]);
+  return runGh(["issue", "create", "--title", issue.title, "--body", issue.body]);
 }
 
 export async function sendIssueAction(options: { all?: boolean } = {}) {
   const isAll = options.all || process.env.npm_config_all === "true";
-  const { checkResultReturn, checkResultVoid, createNg, createOk } =
-    resultUtility;
+  const { checkResultReturn, checkResultVoid, createNg, createOk } = resultUtility;
   const draftFilesResult = await findDraftIssues();
 
   if (draftFilesResult.isErr) {
@@ -114,18 +99,14 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
     });
 
     if (issueUrl.isErr) {
-      spin.cancel(
-        `Failed to send issue draft: ${selectedDraft}\nError: ${issueUrl.err.message}`,
-      );
+      spin.cancel(`Failed to send issue draft: ${selectedDraft}\nError: ${issueUrl.err.message}`);
       process.exit(1);
     }
 
     rmSync(join(process.cwd(), selectedDraft));
     spin.message(`Sent ${selectedDraft}`);
 
-    log.success(
-      `${bold(green("Issue created successfully"))}\n${issueUrl.value}\n`,
-    );
+    log.success(`${bold(green("Issue created successfully"))}\n${issueUrl.value}\n`);
     log.success(`${bold(green("Removed draft"))}\n${selectedDraft}\n`);
   }
 
