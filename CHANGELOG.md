@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.4.1
+
+### Patch Changes
+
+- [#37](https://github.com/ShionTerunaga/gh-issue/pull/37) [`835ee48`](https://github.com/ShionTerunaga/gh-issue/commit/835ee486633a4541a189e05097531ca8f3996857) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - I removed the `console.log` statements so that all messages are displayed internally.
+
 ## 0.4.0
 
 ### Minor Changes
