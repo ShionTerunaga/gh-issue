@@ -1,6 +1,6 @@
 import { Result, resultUtility, type Option } from "ts-shared";
 import { createPromptError } from "../shared/error";
-import { confirm, isCancel } from "@clack/prompts";
+import { cancel, confirm, isCancel } from "@clack/prompts";
 import { multiselectPrompts, type PromptOption } from "./common";
 
 type IssueTemplateType = "bug_report" | "feature_request";
@@ -38,7 +38,9 @@ const languageChoices: PromptOption<Language>[] = [
   },
 ];
 
-export async function selectIssueTemplateTypes(): Promise<Result<IssueTemplateType[], Error>> {
+export async function selectIssueTemplateTypes(): Promise<
+  Result<IssueTemplateType[], Error>
+> {
   return await multiselectPrompts({
     message: "Select issue template types",
     options: issueTemplateTypeChoices,
@@ -64,7 +66,8 @@ export async function confirmInit(): Promise<Result<boolean, Error>> {
       await confirm({
         message: `This will create issue templates in .github/ISSUE_TEMPLATE. Do you want to continue?`,
       }),
-    err: (e) => createNg(createPromptError("Failed to get user confirmation", e)),
+    err: (e) =>
+      createNg(createPromptError("Failed to get user confirmation", e)),
   });
 
   if (response.isErr) {
@@ -72,7 +75,7 @@ export async function confirmInit(): Promise<Result<boolean, Error>> {
   }
 
   if (isCancel(response.value)) {
-    console.log("Initialization canceled.");
+    cancel("Initialization canceled.");
     process.exit(0);
   }
 

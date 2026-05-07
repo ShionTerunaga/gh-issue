@@ -1,4 +1,13 @@
-import { isCancel, multiline, multiselect, select, settings, text } from "@clack/prompts";
+import {
+  cancel,
+  isCancel,
+  log,
+  multiline,
+  multiselect,
+  select,
+  settings,
+  text,
+} from "@clack/prompts";
 import { Result, resultUtility } from "ts-shared";
 import { createPromptError } from "../shared/error";
 import { bold } from "picocolors";
@@ -52,7 +61,7 @@ export async function textPrompts({
   }
 
   if (isCancel(result.value)) {
-    console.log(cancelMessage);
+    cancel(cancelMessage);
     process.exit(0);
   }
 
@@ -72,7 +81,7 @@ export async function multilineTextPrompts({
 }) {
   const { checkPromiseReturn, createNg } = resultUtility;
 
-  console.log(`${bold("To send, press the Tab key and then press Enter.")}\n`);
+  log.message(`${bold("To send, press the Tab key and then press Enter.")}\n`);
 
   settings.actions.delete("space");
 
@@ -93,7 +102,7 @@ export async function multilineTextPrompts({
   }
 
   if (isCancel(result.value)) {
-    console.log(cancelMessage);
+    cancel(cancelMessage);
     process.exit(0);
   }
 
@@ -129,7 +138,7 @@ export async function selectPrompts<T extends PromptValue>({
   }
 
   if (isCancel(result.value)) {
-    console.log(cancelMessage);
+    cancel(cancelMessage);
     process.exit(0);
   }
 
@@ -149,7 +158,9 @@ export async function multiselectPrompts<T extends PromptValue>({
 }): Promise<Result<T[], Error>> {
   const { createNg, createOk, checkPromiseReturn } = resultUtility;
 
-  const initialValues = options.filter((option) => option.selected).map((option) => option.value);
+  const initialValues = options
+    .filter((option) => option.selected)
+    .map((option) => option.value);
 
   const result = await checkPromiseReturn({
     fn: async () =>
@@ -166,7 +177,7 @@ export async function multiselectPrompts<T extends PromptValue>({
   }
 
   if (isCancel(result.value)) {
-    console.log(cancelMessage);
+    cancel(cancelMessage);
     process.exit(0);
   }
 

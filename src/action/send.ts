@@ -1,4 +1,4 @@
-import { spinner } from "@clack/prompts";
+import { log, spinner } from "@clack/prompts";
 import { execFileSync } from "node:child_process";
 import { rmSync } from "node:fs";
 import { join } from "node:path";
@@ -19,25 +19,40 @@ function verifyGhAuth() {
 }
 
 function resolveRepository() {
-  return runGh(["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]);
+  return runGh([
+    "repo",
+    "view",
+    "--json",
+    "nameWithOwner",
+    "--jq",
+    ".nameWithOwner",
+  ]);
 }
 
 function createIssueWithGh(issue: { title: string; body: string }) {
-  return runGh(["issue", "create", "--title", issue.title, "--body", issue.body]);
+  return runGh([
+    "issue",
+    "create",
+    "--title",
+    issue.title,
+    "--body",
+    issue.body,
+  ]);
 }
 
 export async function sendIssueAction(options: { all?: boolean } = {}) {
   const isAll = options.all || process.env.npm_config_all === "true";
-  const { checkResultReturn, checkResultVoid, createNg, createOk } = resultUtility;
+  const { checkResultReturn, checkResultVoid, createNg, createOk } =
+    resultUtility;
   const draftFilesResult = await findDraftIssues();
 
   if (draftFilesResult.isErr) {
-    console.error(`Error: ${draftFilesResult.err.message}`);
+    log.error(`Error: ${draftFilesResult.err.message}`);
     process.exit(1);
   }
 
   if (draftFilesResult.value.length === 0) {
-    console.error("No issue drafts found in .gh-issue.");
+    log.error("No issue drafts found in .gh-issue.");
     process.exit(1);
   }
 
@@ -46,7 +61,7 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
     : await selectDraftIssues(draftFilesResult.value);
 
   if (selectedIssues.isErr) {
-    console.error(`Error: ${selectedIssues.err.message}`);
+    log.error(`Error: ${selectedIssues.err.message}`);
     process.exit(1);
   }
 
@@ -61,7 +76,7 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
   });
 
   if (authResult.isErr) {
-    console.error(`Error: ${authResult.err.message}`);
+    log.error(`Error: ${authResult.err.message}`);
     process.exit(1);
   }
 
@@ -76,15 +91,13 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
   });
 
   if (repositoryResult.isErr) {
-    console.error(`Error: ${repositoryResult.err.message}`);
+    log.error(`Error: ${repositoryResult.err.message}`);
     process.exit(1);
   }
 
-  console.log(`${bold(green("Repository"))}\n${repositoryResult.value}\n`);
-
   const spin = spinner();
 
-  spin.start("Sending issue drafts...");
+  spin.start(`${bold(green("Repository"))}\n${repositoryResult.value}\n`);
 
   for (const selectedDraft of selectedIssues.value) {
     spin.message(`Sending ${selectedDraft}...`);
@@ -101,16 +114,19 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
     });
 
     if (issueUrl.isErr) {
-      spin.stop(`Failed while sending ${selectedDraft}`);
-      console.error(`Error: ${issueUrl.err.message}`);
+      spin.cancel(
+        `Failed to send issue draft: ${selectedDraft}\nError: ${issueUrl.err.message}`,
+      );
       process.exit(1);
     }
 
     rmSync(join(process.cwd(), selectedDraft));
     spin.message(`Sent ${selectedDraft}`);
 
-    console.log(`${bold(green("Issue created successfully"))}\n${issueUrl.value}\n`);
-    console.log(`${bold(green("Removed draft"))}\n${selectedDraft}\n`);
+    log.success(
+      `${bold(green("Issue created successfully"))}\n${issueUrl.value}\n`,
+    );
+    log.success(`${bold(green("Removed draft"))}\n${selectedDraft}\n`);
   }
 
   spin.stop("All selected drafts were sent.");

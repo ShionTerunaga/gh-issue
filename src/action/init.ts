@@ -3,8 +3,13 @@ import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { copy } from "../helper/copy";
-import { confirmInit, Language, selectIssueTemplateTypes, selectLanguages } from "../command/init";
-import { spinner } from "@clack/prompts";
+import {
+  confirmInit,
+  Language,
+  selectIssueTemplateTypes,
+  selectLanguages,
+} from "../command/init";
+import { cancel, log, spinner } from "@clack/prompts";
 
 interface IssueTemplateMaterial {
   lang: Language;
@@ -15,36 +20,36 @@ export async function initAction() {
   const typeResult = await selectIssueTemplateTypes();
 
   if (typeResult.isErr) {
-    console.error(`Error: ${typeResult.err.message}`);
+    log.error(`Error: ${typeResult.err.message}`);
     process.exit(1);
   }
 
   if (typeResult.value.length === 0) {
-    console.log("No template types selected. Canceled.");
+    cancel(`No template types selected. Canceled.`);
     process.exit(0);
   }
 
   const langResult = await selectLanguages();
 
   if (langResult.isErr) {
-    console.error(`Error: ${langResult.err.message}`);
+    log.error(`Error: ${langResult.err.message}`);
     process.exit(1);
   }
 
   if (langResult.value.length === 0) {
-    console.log("No languages selected. Canceled.");
+    cancel(`No languages selected. Canceled.`);
     process.exit(0);
   }
 
   const isComfirmed = await confirmInit();
 
   if (isComfirmed.isErr) {
-    console.error(`Error: ${isComfirmed.err.message}`);
+    log.error(`Error: ${isComfirmed.err.message}`);
     process.exit(1);
   }
 
   if (!isComfirmed.value) {
-    console.log("Canceled.");
+    cancel("Canceled.");
     process.exit(0);
   }
 
@@ -73,7 +78,7 @@ export async function initAction() {
     const templatePath = join(issueTemplateDir, template.file);
 
     if (existsSync(templatePath)) {
-      console.log(`Already exists ${templatePath}. Skipped.`);
+      spin.error(`Already exists ${templatePath}. Skipped.`);
       continue;
     }
 
@@ -87,7 +92,7 @@ export async function initAction() {
     });
 
     if (res.isErr) {
-      console.error(`Error: ${res.err.message}`);
+      spin.error(`Error: ${res.err.message}`);
       process.exit(1);
     }
 

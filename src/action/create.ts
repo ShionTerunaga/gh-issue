@@ -8,6 +8,7 @@ import { bold, green } from "picocolors";
 import { textPrompts } from "../command/common";
 import { createContents, IssueContents } from "../helper/create-contents";
 import { writeIssueMarkdown } from "../helper/write-issue-markdown";
+import { log } from "@clack/prompts";
 
 export interface SelectMaterial {
   name: string;
@@ -20,7 +21,9 @@ export async function createIssueAction() {
   const ghIssueDir = join(process.cwd(), ".gh-issue");
 
   if (!existsSync(ghIssueDir)) {
-    console.error(".gh-issue directory does not exist. Please run `gh-issue init` first.");
+    log.error(
+      ".gh-issue directory does not exist. Please run `gh-issue init` first.",
+    );
     process.exit(1);
   }
 
@@ -29,7 +32,7 @@ export async function createIssueAction() {
   const issueContents: IssueContents[] = [];
 
   if (findTemplateResult.isErr) {
-    console.error(`Error: ${findTemplateResult.err.message}`);
+    log.error(`Error: ${findTemplateResult.err.message}`);
     process.exit(1);
   }
 
@@ -39,34 +42,38 @@ export async function createIssueAction() {
   });
 
   if (templateContents.isErr) {
-    console.error(`Error: ${templateContents.err.message}`);
+    log.error(`Error: ${templateContents.err.message}`);
     process.exit(1);
   }
 
-  const selectedMaterial: SelectMaterial[] = templateContents.value.map((tmp) => ({
-    name: tmp.name,
-    fileName: tmp.fileName,
-  }));
+  const selectedMaterial: SelectMaterial[] = templateContents.value.map(
+    (tmp) => ({
+      name: tmp.name,
+      fileName: tmp.fileName,
+    }),
+  );
 
   const selectedTemplate = await selectTemplate(selectedMaterial);
 
   if (selectedTemplate.isErr) {
-    console.error(`Error: ${selectedTemplate.err.message}`);
+    log.error(`Error: ${selectedTemplate.err.message}`);
     process.exit(1);
   }
 
   const foundTemplate = optionConversion(
-    templateContents.value.find((tmp) => tmp.fileName === selectedTemplate.value),
+    templateContents.value.find(
+      (tmp) => tmp.fileName === selectedTemplate.value,
+    ),
   );
 
   if (foundTemplate.isNone) {
-    console.error("Error: Selected template not found");
+    log.error("Error: Selected template not found");
     process.exit(1);
   }
 
-  console.log(`${bold(green(foundTemplate.value.name))}\n`);
+  log.message(`${bold(green(foundTemplate.value.name))}\n`);
 
-  console.log(
+  log.message(
     foundTemplate.value.contents.description
       ? `${foundTemplate.value.contents.description}\n`
       : "No contents provided.\n",
@@ -78,7 +85,7 @@ export async function createIssueAction() {
   });
 
   if (title.isErr) {
-    console.error(`Error: ${title.err.message}`);
+    log.error(`Error: ${title.err.message}`);
     process.exit(1);
   }
 
@@ -91,7 +98,7 @@ export async function createIssueAction() {
     const contentResult = await createContents(tmp);
 
     if (contentResult.isErr) {
-      console.error(`Error: ${contentResult.err.message}`);
+      log.error(`Error: ${contentResult.err.message}`);
       process.exit(1);
     }
 
@@ -103,9 +110,9 @@ export async function createIssueAction() {
   const writeMarkdownResult = await writeIssueMarkdown(issueContents);
 
   if (writeMarkdownResult.isErr) {
-    console.error(`Error: ${writeMarkdownResult.err.message}`);
+    log.error(`Error: ${writeMarkdownResult.err.message}`);
     process.exit(1);
   }
 
-  console.log(`Saved issue draft: ${writeMarkdownResult.value}`);
+  log.success(`Saved issue draft: ${writeMarkdownResult.value}`);
 }
