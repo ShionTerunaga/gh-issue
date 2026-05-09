@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.4.2
+
+### Patch Changes
+
+- [`f0b9512`](https://github.com/ShionTerunaga/gh-issue/commit/f0b9512576ce0f9a1ef2e55d3222bc679093e014) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Vulnerability Response
+
 ## 0.4.1
 
 ### Patch Changes
