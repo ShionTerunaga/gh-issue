@@ -63,56 +63,68 @@ export async function editTextareaWithVim({
   initialValue = "",
   title,
   description,
+  allowEmpty = false,
 }: {
   initialValue?: string;
   title?: string;
   description?: string;
   allowEmpty?: boolean;
 }): Promise<Result<string, Error>> {
-  const { checkPromiseReturn, checkPromiseVoid, createNg, createOk, checkResultVoid } =
-    resultUtility;
+  const {
+    checkPromiseReturn,
+    checkPromiseVoid,
+    createNg,
+    createOk,
+    checkResultVoid,
+  } = resultUtility;
   const filePath = createHiddenFilePath();
 
-  const writeResult = await checkPromiseVoid({
-    fn: async () => {
-      await writeFile(
-        filePath,
-        createEditorTemplate({
-          title,
-          description,
-          initialValue,
-        }),
-        { flag: "wx" },
-      );
-    },
-    err: (error) => createNg(error as Error),
-  });
+  try {
+    const writeResult = await checkPromiseVoid({
+      fn: async () => {
+        await writeFile(
+          filePath,
+          createEditorTemplate({
+            title,
+            description,
+            initialValue,
+          }),
+          { flag: "wx" },
+        );
+      },
+      err: (error) => createNg(error as Error),
+    });
 
-  if (writeResult.isErr) {
-    return writeResult;
+    if (writeResult.isErr) {
+      return writeResult;
+    }
+
+    const checkResult = checkResultVoid({
+      fn: () => openVim(filePath),
+      err: (error) => createNg(error as Error),
+    });
+
+    if (checkResult.isErr) {
+      return checkResult;
+    }
+
+    const readResult = await checkPromiseReturn({
+      fn: async () => await readFile(filePath, "utf8"),
+      err: (error) => createNg(error as Error),
+    });
+
+    if (readResult.isErr) {
+      return readResult;
+    }
+
+    const content = stripCommentLines(readResult.value);
+
+    if (!allowEmpty && content.trim().length === 0) {
+      return createNg(new Error("No content was entered in vim"));
+    }
+
+    return createOk(content);
+  } finally {
+    await unlink(filePath).catch(() => undefined);
   }
-
-  const checkResult = checkResultVoid({
-    fn: () => openVim(filePath),
-    err: (error) => createNg(error as Error),
-  });
-
-  if (checkResult.isErr) {
-    return checkResult;
-  }
-
-  const readResult = await checkPromiseReturn({
-    fn: async () => await readFile(filePath, "utf8"),
-    err: (error) => createNg(error as Error),
-  });
-
-  if (readResult.isErr) {
-    return readResult;
-  }
-
-  const content = stripCommentLines(readResult.value);
-
-  await unlink(filePath).catch(() => undefined);
-
-  return createOk(content);
 }
