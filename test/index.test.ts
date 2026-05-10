@@ -7,11 +7,7 @@ import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 
 import { editTextareaWithVim } from "../src/helper/textarea-editor";
 import { main } from "../src/index";
-import {
-  createIssueTemplate,
-  createIssueTemplateYaml,
-  initIssueTemplates,
-} from "../src/templates";
+import { createIssueTemplate, createIssueTemplateYaml, initIssueTemplates } from "../src/templates";
 
 let openedEditorPath = "";
 const compatibilityTemplatePaths = [
