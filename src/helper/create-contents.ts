@@ -10,6 +10,7 @@ import {
 } from "../command/common";
 import { parseCheckboxesValue } from "./checkboxes-parser";
 import { log } from "@clack/prompts";
+import { editTextareaWithVim } from "./textarea-editor";
 
 export interface IssueContents {
   title: string;
@@ -60,10 +61,51 @@ export async function createContents(
       );
       log.message(blue(tmpBody.attributes.description || "No description") + "\n");
 
-      const textareaResult = await multilineTextPrompts({
-        message: tmpBody.attributes.label,
-        placeholder: tmpBody.attributes.placeholder,
+      const inputModeOptions: PromptOption<"vim" | "direct" | "skip">[] = [
+        {
+          title: "Open in vim",
+          value: "vim",
+          hint: "Edit in a temporary hidden file",
+          selected: true,
+        },
+        {
+          title: "Enter directly",
+          value: "direct",
+          hint: "Use the current multiline prompt",
+        },
+      ];
+
+      if (!tmpBody.validations?.required) {
+        inputModeOptions.push({
+          title: "Do not enter content",
+          value: "skip",
+          hint: "Store an empty string for this field",
+        });
+      }
+
+      const inputModeResult = await selectPrompts<"vim" | "direct" | "skip">({
+        message: "Choose how to enter the textarea content",
+        options: inputModeOptions,
       });
+
+      if (inputModeResult.isErr) {
+        return createNg(inputModeResult.err);
+      }
+
+      const textareaResult =
+        inputModeResult.value === "skip"
+          ? resultUtility.createOk("")
+          : inputModeResult.value === "vim"
+            ? await editTextareaWithVim({
+                initialValue: tmpBody.attributes.value,
+                title: tmpBody.attributes.label,
+                description: tmpBody.attributes.description,
+                allowEmpty: tmpBody.validations?.required === true,
+              })
+            : await multilineTextPrompts({
+                message: tmpBody.attributes.label,
+                placeholder: tmpBody.attributes.placeholder,
+              });
 
       if (textareaResult.isErr) {
         return createNg(textareaResult.err);
