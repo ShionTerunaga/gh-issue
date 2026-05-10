@@ -24,7 +24,12 @@ export function createCommander() {
     .description("Create bug report and feature request issue templates")
     .action(initAction);
 
-  program.command("create").description("Create an issue template").action(createIssueAction);
+  program
+    .command("create")
+    .description("Create an issue template")
+    .option("--vim", "Use Vim editor for textarea")
+    .option("--no-vim", "Use default editor for textarea")
+    .action((options) => createIssueAction(options));
   program
     .command("send")
     .description("Send an issue draft to GitHub")

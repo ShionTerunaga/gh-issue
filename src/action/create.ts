@@ -9,13 +9,14 @@ import { textPrompts } from "../command/common";
 import { createContents, IssueContents } from "../helper/create-contents";
 import { writeIssueMarkdown } from "../helper/write-issue-markdown";
 import { log } from "@clack/prompts";
+import type { TextareaCreateOptions } from "../helper/textarea-options";
 
 export interface SelectMaterial {
   name: string;
   fileName: string;
 }
 
-export async function createIssueAction() {
+export async function createIssueAction(options: TextareaCreateOptions = {}) {
   const { checkResultReturn, createNg } = resultUtility;
   const { optionConversion } = optionUtility;
   const ghIssueDir = join(process.cwd(), ".gh-issue");
@@ -89,7 +90,7 @@ export async function createIssueAction() {
   });
 
   for (const tmp of foundTemplate.value.contents.body) {
-    const contentResult = await createContents(tmp);
+    const contentResult = await createContents(tmp, options);
 
     if (contentResult.isErr) {
       log.error(`Error: ${contentResult.err.message}`);
