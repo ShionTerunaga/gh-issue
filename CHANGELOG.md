@@ -1,5 +1,13 @@
 # gh-issue
 
+## 0.5.0
+
+### Minor Changes
+
+- [#43](https://github.com/ShionTerunaga/gh-issue/pull/43) [`3d36415`](https://github.com/ShionTerunaga/gh-issue/commit/3d364158d4cf10ffcc1a6d66cdd845799823243d) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Add editing options for the text area
+
+- [#41](https://github.com/ShionTerunaga/gh-issue/pull/41) [`5cdfaad`](https://github.com/ShionTerunaga/gh-issue/commit/5cdfaade41f76f140f112046a26d03a661f2b1e6) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Add Markdown input support to the text area
+
 ## 0.4.2
 
 ### Patch Changes
