@@ -68,13 +68,8 @@ export async function editTextareaWithVim({
   title?: string;
   description?: string;
 }): Promise<Result<string, Error>> {
-  const {
-    checkPromiseReturn,
-    checkPromiseVoid,
-    createNg,
-    createOk,
-    checkResultVoid,
-  } = resultUtility;
+  const { checkPromiseReturn, checkPromiseVoid, createNg, createOk, checkResultVoid } =
+    resultUtility;
   const filePath = createHiddenFilePath();
 
   try {
