@@ -63,12 +63,10 @@ export async function editTextareaWithVim({
   initialValue = "",
   title,
   description,
-  allowEmpty = false,
 }: {
   initialValue?: string;
   title?: string;
   description?: string;
-  allowEmpty?: boolean;
 }): Promise<Result<string, Error>> {
   const {
     checkPromiseReturn,
