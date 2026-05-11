@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.5.1
+
+### Patch Changes
+
+- [#46](https://github.com/ShionTerunaga/gh-issue/pull/46) [`f1ed9fe`](https://github.com/ShionTerunaga/gh-issue/commit/f1ed9fe5d8d604f880daa5882c3f8e5890c15ab1) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Fixed the init flow.
+
 ## 0.5.0
 
 ### Minor Changes
