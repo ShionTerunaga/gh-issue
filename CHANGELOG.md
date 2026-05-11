@@ -1,5 +1,15 @@
 # gh-issue
 
+## 0.6.0
+
+### Minor Changes
+
+- [#48](https://github.com/ShionTerunaga/gh-issue/pull/48) [`f36847e`](https://github.com/ShionTerunaga/gh-issue/commit/f36847e00a5deb84cfba43bc6fea2e313b09bcc9) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Create the `add` command for creating templates
+
+### Patch Changes
+
+- [#50](https://github.com/ShionTerunaga/gh-issue/pull/50) [`5117632`](https://github.com/ShionTerunaga/gh-issue/commit/51176327d6a1df97fc0c776bb282bf1cce6d32df) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Remove the error that occurs when closing Vim
+
 ## 0.5.1
 
 ### Patch Changes
