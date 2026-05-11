@@ -22,7 +22,7 @@ importers:
         version: 3.3.3
       gh-issue:
         specifier: github:ShionTerunaga/gh-issue#release
-        version: https://codeload.github.com/ShionTerunaga/gh-issue/tar.gz/99dd6ea36bd0cf0d4efbfeba9b11d60bca6cd945
+        version: https://codeload.github.com/ShionTerunaga/gh-issue/tar.gz/8e1309684b06f88b0574d262730384ffc89abffc
       js-yaml:
         specifier: ^4.1.1
         version: 4.1.1
@@ -1059,9 +1059,9 @@ packages:
   get-tsconfig@4.14.0:
     resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
 
-  gh-issue@https://codeload.github.com/ShionTerunaga/gh-issue/tar.gz/99dd6ea36bd0cf0d4efbfeba9b11d60bca6cd945:
-    resolution: {tarball: https://codeload.github.com/ShionTerunaga/gh-issue/tar.gz/99dd6ea36bd0cf0d4efbfeba9b11d60bca6cd945}
-    version: 0.4.1
+  gh-issue@https://codeload.github.com/ShionTerunaga/gh-issue/tar.gz/8e1309684b06f88b0574d262730384ffc89abffc:
+    resolution: {tarball: https://codeload.github.com/ShionTerunaga/gh-issue/tar.gz/8e1309684b06f88b0574d262730384ffc89abffc}
+    version: 0.5.0
     engines: {node: '>=20'}
     hasBin: true
 
@@ -1578,6 +1578,11 @@ packages:
 
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
+
+  ts-shared@https://codeload.github.com/ShionTerunaga/ts-shared/tar.gz/c5d68bed2a1bfdf89bf67ad5e6e71ac4253065ee:
+    resolution: {tarball: https://codeload.github.com/ShionTerunaga/ts-shared/tar.gz/c5d68bed2a1bfdf89bf67ad5e6e71ac4253065ee}
+    version: 1.1.5
+    engines: {node: '>=22.12.0'}
 
   ts-shared@https://codeload.github.com/ShionTerunaga/ts-shared/tar.gz/d482a716f2768dcdc151b221b3b37ee60a83d6e6:
     resolution: {tarball: https://codeload.github.com/ShionTerunaga/ts-shared/tar.gz/d482a716f2768dcdc151b221b3b37ee60a83d6e6}
@@ -2645,11 +2650,11 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  gh-issue@https://codeload.github.com/ShionTerunaga/gh-issue/tar.gz/99dd6ea36bd0cf0d4efbfeba9b11d60bca6cd945:
+  gh-issue@https://codeload.github.com/ShionTerunaga/gh-issue/tar.gz/8e1309684b06f88b0574d262730384ffc89abffc:
     dependencies:
       commander: 14.0.3
       fast-glob: 3.3.3
-      ts-shared: https://codeload.github.com/ShionTerunaga/ts-shared/tar.gz/d482a716f2768dcdc151b221b3b37ee60a83d6e6
+      ts-shared: https://codeload.github.com/ShionTerunaga/ts-shared/tar.gz/c5d68bed2a1bfdf89bf67ad5e6e71ac4253065ee
 
   git-raw-commits@5.0.1(conventional-commits-parser@6.4.0):
     dependencies:
@@ -3091,6 +3096,8 @@ snapshots:
       is-number: 7.0.0
 
   tr46@0.0.3: {}
+
+  ts-shared@https://codeload.github.com/ShionTerunaga/ts-shared/tar.gz/c5d68bed2a1bfdf89bf67ad5e6e71ac4253065ee: {}
 
   ts-shared@https://codeload.github.com/ShionTerunaga/ts-shared/tar.gz/d482a716f2768dcdc151b221b3b37ee60a83d6e6: {}
 

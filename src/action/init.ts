@@ -3,7 +3,13 @@ import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { copy } from "../helper/copy";
-import { confirmInit, Language, selectIssueTemplateTypes, selectLanguages } from "../command/init";
+import {
+  confirmCreateTemplates,
+  confirmInit,
+  Language,
+  selectIssueTemplateTypes,
+  selectLanguages,
+} from "../command/init";
 import { cancel, log, spinner } from "@clack/prompts";
 
 interface IssueTemplateMaterial {
@@ -12,6 +18,33 @@ interface IssueTemplateMaterial {
 }
 
 export async function initAction() {
+  const ghIssueDir = join(process.cwd(), ".gh-issue");
+  const ghIssueReadmePath = join(ghIssueDir, "README.md");
+  const spin = spinner();
+
+  if (existsSync(ghIssueDir)) {
+    cancel(".gh-issue already exists. Initialization has already been completed.");
+    process.exit(0);
+  }
+
+  const shouldCreateTemplates = await confirmCreateTemplates();
+
+  if (shouldCreateTemplates.isErr) {
+    log.error(`Error: ${shouldCreateTemplates.err.message}`);
+    process.exit(1);
+  }
+
+  if (!shouldCreateTemplates.value) {
+    await mkdir(ghIssueDir, { recursive: true });
+
+    if (!existsSync(ghIssueReadmePath)) {
+      await writeFile(ghIssueReadmePath, `# gh-issue\n\nThis directory is managed by gh-issue.`);
+    }
+
+    log.message("All done!");
+    process.exit(0);
+  }
+
   const typeResult = await selectIssueTemplateTypes();
 
   if (typeResult.isErr) {
@@ -58,17 +91,14 @@ export async function initAction() {
 
   const githubDir = join(process.cwd(), ".github");
   const issueTemplateDir = join(githubDir, "ISSUE_TEMPLATE");
-  const ghIssueDir = join(process.cwd(), ".gh-issue");
-  const ghIssueReadmePath = join(ghIssueDir, "README.md");
   const cliDir = dirname(fileURLToPath(import.meta.url));
   const templateRoot = join(cliDir, "template");
 
   await mkdir(githubDir, { recursive: true });
   await mkdir(issueTemplateDir, { recursive: true });
 
-  const spin = spinner();
-
   spin.start("Creating issue templates...");
+
   for (const template of templates) {
     const templatePath = join(issueTemplateDir, template.file);
 
@@ -93,18 +123,13 @@ export async function initAction() {
 
     spin.message(`Created ${templatePath}\n`);
   }
+  spin.stop();
 
   await mkdir(ghIssueDir, { recursive: true });
 
   if (!existsSync(ghIssueReadmePath)) {
-    await writeFile(
-      ghIssueReadmePath,
-      `# gh-issue
-
-This directory is managed by gh-issue.
-`,
-    );
+    await writeFile(ghIssueReadmePath, `# gh-issue\n\nThis directory is managed by gh-issue.`);
   }
 
-  spin.stop("All done!");
+  log.message("All done!");
 }
