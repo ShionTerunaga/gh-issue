@@ -3,6 +3,7 @@ import { type InitialReturnValue } from "prompts";
 import { initAction } from "../action/init";
 import { createIssueAction } from "../action/create";
 import { sendIssueAction } from "../action/send";
+import { addTemplateAction } from "../action/add";
 
 export const onPromptState = (state: {
   value: InitialReturnValue;
@@ -17,7 +18,9 @@ export const onPromptState = (state: {
 };
 
 export function createCommander() {
-  const program = new Command().description("Create GitHub issue templates").version("0.0.0");
+  const program = new Command()
+    .description("Create GitHub issue templates")
+    .version("0.0.0");
 
   program
     .command("init")
@@ -30,11 +33,17 @@ export function createCommander() {
     .option("--vim", "Use Vim editor for textarea")
     .option("--no-vim", "Use default editor for textarea")
     .action((options) => createIssueAction(options));
+
   program
     .command("send")
     .description("Send an issue draft to GitHub")
     .option("--all", "Send all issue drafts without selection prompt")
     .action((options) => sendIssueAction(options));
+
+  program
+    .command("add")
+    .description("Add a new issue template to .gh-issue")
+    .action(addTemplateAction);
 
   return program;
 }
