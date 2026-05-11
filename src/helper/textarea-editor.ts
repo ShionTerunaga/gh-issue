@@ -70,8 +70,13 @@ export async function editTextareaWithVim({
   description?: string;
   allowEmpty?: boolean;
 }): Promise<Result<string, Error>> {
-  const { checkPromiseReturn, checkPromiseVoid, createNg, createOk, checkResultVoid } =
-    resultUtility;
+  const {
+    checkPromiseReturn,
+    checkPromiseVoid,
+    createNg,
+    createOk,
+    checkResultVoid,
+  } = resultUtility;
   const filePath = createHiddenFilePath();
 
   try {
@@ -113,10 +118,6 @@ export async function editTextareaWithVim({
     }
 
     const content = stripCommentLines(readResult.value);
-
-    if (!allowEmpty && content.trim().length === 0) {
-      return createNg(new Error("No content was entered in vim"));
-    }
 
     return createOk(content);
   } finally {
