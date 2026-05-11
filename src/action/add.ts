@@ -1,51 +1,19 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { copy } from "../helper/copy";
-import {
-  confirmCreateTemplates,
-  confirmInit,
-  Language,
-  selectIssueTemplateTypes,
-  selectLanguages,
-} from "../command/init";
 import { cancel, log, outro, spinner } from "@clack/prompts";
+import { Language, selectIssueTemplateTypes, selectLanguages } from "../command/init";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import { mkdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { copy } from "../helper/copy";
 
 interface IssueTemplateMaterial {
   lang: Language;
   file: string;
 }
 
-export async function initAction() {
-  const ghIssueDir = join(process.cwd(), ".gh-issue");
-  const ghIssueReadmePath = join(ghIssueDir, "README.md");
-  const spin = spinner();
-
-  if (existsSync(ghIssueDir)) {
-    cancel(".gh-issue already exists. Initialization has already been completed.");
-    process.exit(0);
-  }
-
-  const shouldCreateTemplates = await confirmCreateTemplates();
-
-  if (shouldCreateTemplates.isErr) {
-    log.error(`Error: ${shouldCreateTemplates.err.message}`);
-    process.exit(1);
-  }
-
-  if (!shouldCreateTemplates.value) {
-    await mkdir(ghIssueDir, { recursive: true });
-
-    if (!existsSync(ghIssueReadmePath)) {
-      await writeFile(ghIssueReadmePath, `# gh-issue\n\nThis directory is managed by gh-issue.`);
-    }
-
-    outro("All done!");
-    process.exit(0);
-  }
-
+export async function addTemplateAction() {
   const typeResult = await selectIssueTemplateTypes();
+  const spin = spinner();
 
   if (typeResult.isErr) {
     log.error(`Error: ${typeResult.err.message}`);
@@ -66,18 +34,6 @@ export async function initAction() {
 
   if (langResult.value.length === 0) {
     cancel(`No languages selected. Canceled.`);
-    process.exit(0);
-  }
-
-  const isComfirmed = await confirmInit();
-
-  if (isComfirmed.isErr) {
-    log.error(`Error: ${isComfirmed.err.message}`);
-    process.exit(1);
-  }
-
-  if (!isComfirmed.value) {
-    cancel("Canceled.");
     process.exit(0);
   }
 
@@ -124,12 +80,6 @@ export async function initAction() {
     spin.message(`Created ${templatePath}\n`);
   }
   spin.stop();
-
-  await mkdir(ghIssueDir, { recursive: true });
-
-  if (!existsSync(ghIssueReadmePath)) {
-    await writeFile(ghIssueReadmePath, `# gh-issue\n\nThis directory is managed by gh-issue.`);
-  }
 
   outro("All done!");
 }
