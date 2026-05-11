@@ -1,9 +1,5 @@
 import { cancel, log, outro, spinner } from "@clack/prompts";
-import {
-  Language,
-  selectIssueTemplateTypes,
-  selectLanguages,
-} from "../command/init";
+import { Language, selectIssueTemplateTypes, selectLanguages } from "../command/init";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { mkdir } from "node:fs/promises";
