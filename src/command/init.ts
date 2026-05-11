@@ -78,3 +78,26 @@ export async function confirmInit(): Promise<Result<boolean, Error>> {
 
   return createOk(response.value as boolean);
 }
+
+export async function confirmCreateTemplates(): Promise<Result<boolean, Error>> {
+  const { checkPromiseReturn, createNg, createOk } = resultUtility;
+
+  const response = await checkPromiseReturn({
+    fn: async () =>
+      await confirm({
+        message: `Do you want to create issue templates in .github/ISSUE_TEMPLATE?`,
+      }),
+    err: (e) => createNg(createPromptError("Failed to get user confirmation", e)),
+  });
+
+  if (response.isErr) {
+    return response;
+  }
+
+  if (isCancel(response.value)) {
+    cancel("Initialization canceled.");
+    process.exit(0);
+  }
+
+  return createOk(response.value as boolean);
+}
