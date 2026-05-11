@@ -23,9 +23,7 @@ export async function initAction() {
   const spin = spinner();
 
   if (existsSync(ghIssueDir)) {
-    cancel(
-      ".gh-issue already exists. Initialization has already been completed.",
-    );
+    cancel(".gh-issue already exists. Initialization has already been completed.");
     process.exit(0);
   }
 
@@ -40,10 +38,7 @@ export async function initAction() {
     await mkdir(ghIssueDir, { recursive: true });
 
     if (!existsSync(ghIssueReadmePath)) {
-      await writeFile(
-        ghIssueReadmePath,
-        `# gh-issue\n\nThis directory is managed by gh-issue.`,
-      );
+      await writeFile(ghIssueReadmePath, `# gh-issue\n\nThis directory is managed by gh-issue.`);
     }
 
     log.message("All done!");
@@ -133,10 +128,7 @@ export async function initAction() {
   await mkdir(ghIssueDir, { recursive: true });
 
   if (!existsSync(ghIssueReadmePath)) {
-    await writeFile(
-      ghIssueReadmePath,
-      `# gh-issue\n\nThis directory is managed by gh-issue.`,
-    );
+    await writeFile(ghIssueReadmePath, `# gh-issue\n\nThis directory is managed by gh-issue.`);
   }
 
   log.message("All done!");
