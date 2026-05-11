@@ -137,7 +137,6 @@ export async function createContents(
                 initialValue: tmpBody.attributes.value,
                 title: tmpBody.attributes.label,
                 description: tmpBody.attributes.description,
-                allowEmpty: required,
               })
             : await multilineTextPrompts({
                 message: tmpBody.attributes.label,

@@ -63,12 +63,10 @@ export async function editTextareaWithVim({
   initialValue = "",
   title,
   description,
-  allowEmpty = false,
 }: {
   initialValue?: string;
   title?: string;
   description?: string;
-  allowEmpty?: boolean;
 }): Promise<Result<string, Error>> {
   const { checkPromiseReturn, checkPromiseVoid, createNg, createOk, checkResultVoid } =
     resultUtility;
@@ -113,10 +111,6 @@ export async function editTextareaWithVim({
     }
 
     const content = stripCommentLines(readResult.value);
-
-    if (!allowEmpty && content.trim().length === 0) {
-      return createNg(new Error("No content was entered in vim"));
-    }
 
     return createOk(content);
   } finally {
