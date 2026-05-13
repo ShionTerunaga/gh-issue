@@ -14,6 +14,16 @@ A command line tool for setting up GitHub Issue templates and drafting issues fr
 - Node.js `>= 20`
 - GitHub CLI `gh` for the `send` command
 
+## Authentication
+
+Authenticate GitHub CLI before using `gh-issue`:
+
+```sh
+gh auth login
+```
+
+This is required because `gh-issue` uses `gh` to inspect repositories and create issues.
+
 ## Installation
 
 ### Global installation
@@ -159,12 +169,6 @@ When Vim is used:
 
 Create GitHub Issues from Markdown drafts stored in `.gh-issue/`.
 
-Before using this command, authenticate GitHub CLI:
-
-```sh
-gh auth login
-```
-
 This command:
 
 - reads draft files from `.gh-issue/`
@@ -214,10 +218,11 @@ The build fails when running the release workflow.
 
 ## Typical workflow
 
-1. Run `gh-issue init`
-2. Run `gh-issue create`
-3. Review the draft in `.gh-issue/`
-4. Run `gh-issue send`
+1. Run `gh auth login`
+2. Run `gh-issue init`
+3. Run `gh-issue create`
+4. Review the draft in `.gh-issue/`
+5. Run `gh-issue send`
 
 ## Notes
 
