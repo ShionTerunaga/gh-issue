@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.7.0
+
+### Minor Changes
+
+- [#52](https://github.com/ShionTerunaga/gh-issue/pull/52) [`63656e7`](https://github.com/ShionTerunaga/gh-issue/commit/63656e7aa5e74489078f9c06033211732a18a8e4) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - We have enabled assignment.
+
 ## 0.6.0
 
 ### Minor Changes
