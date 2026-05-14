@@ -5,6 +5,7 @@ import { optionUtility, Result, resultUtility } from "ts-shared";
 import { IssueContents } from "./create-contents";
 
 const TITLE_KEY = "title";
+const ASSIGN_KEY = "assign";
 const fileNameAdjectives = [
   "ancient",
   "blue",
@@ -33,13 +34,22 @@ const fileNameNouns = [
 export function createIssueMarkdown(issueContents: IssueContents[]): Result<string, Error> {
   const { createNg, createOk } = resultUtility;
   const titleContent = issueContents.find((content) => content.title === TITLE_KEY);
+  const assignContent = issueContents.find((content) => content.title === ASSIGN_KEY);
 
   if (!titleContent) {
     return createNg(new Error("Title content is required"));
   }
 
-  const bodyContents = issueContents.filter((content) => content.title !== TITLE_KEY);
-  const markdownLines = [`---`, `title: ${titleContent.contents}`, `---`, ``];
+  const bodyContents = issueContents.filter(
+    (content) => content.title !== TITLE_KEY && content.title !== ASSIGN_KEY,
+  );
+  const markdownLines = [`---`, `title: ${titleContent.contents}`];
+
+  if (assignContent && assignContent.contents.trim().length > 0) {
+    markdownLines.push(`assign: ${assignContent.contents}`);
+  }
+
+  markdownLines.push(`---`, ``);
 
   for (const content of bodyContents) {
     markdownLines.push(`## ${content.title}`, ``, content.contents, ``);

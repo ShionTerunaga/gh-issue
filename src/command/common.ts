@@ -148,11 +148,13 @@ export async function selectPrompts<T extends PromptValue>({
 export async function multiselectPrompts<T extends PromptValue>({
   message,
   options,
+  required,
   cancelMessage = "Selection canceled.",
   errorMessage = "Failed to select options",
 }: {
   message: string;
   options: PromptOption<T>[];
+  required?: boolean;
   cancelMessage?: string;
   errorMessage?: string;
 }): Promise<Result<T[], Error>> {
@@ -164,6 +166,7 @@ export async function multiselectPrompts<T extends PromptValue>({
     fn: async () =>
       await multiselect({
         message,
+        required,
         initialValues,
         options: options.map((option) => toClackOption(option)) as never,
       }),

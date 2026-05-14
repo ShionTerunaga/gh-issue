@@ -10,6 +10,7 @@ export interface DraftIssue {
   filePath: string;
   title: string;
   body: string;
+  assignees?: string[];
 }
 
 export async function findDraftIssues(cwd = process.cwd()): Promise<Result<string[], Error>> {
@@ -43,6 +44,7 @@ export function parseDraftIssue(filePath: string, cwd = process.cwd()): DraftIss
 
   const [, frontMatter, markdownBody] = frontMatterMatch;
   const titleMatch = frontMatter.match(/^title:\s*(.+)$/m);
+  const assignMatch = frontMatter.match(/^assign:\s*(.+)$/m);
 
   if (!titleMatch) {
     throw new Error(`Missing title in front matter: ${filePath}`);
@@ -52,5 +54,9 @@ export function parseDraftIssue(filePath: string, cwd = process.cwd()): DraftIss
     filePath,
     title: titleMatch[1].trim(),
     body: markdownBody.trim(),
+    assignees: assignMatch?.[1]
+      ?.split(",")
+      .map((assignee) => assignee.trim())
+      .filter(Boolean),
   };
 }

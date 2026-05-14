@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { optionUtility, resultUtility } from "ts-shared";
@@ -5,7 +6,7 @@ import { findTemplates } from "../helper/find-template";
 import { ymlParse } from "../helper/yml";
 import { selectTemplate } from "../command/create";
 import { bold, green } from "picocolors";
-import { textPrompts } from "../command/common";
+import { multiselectPrompts, textPrompts } from "../command/common";
 import { createContents, IssueContents } from "../helper/create-contents";
 import { writeIssueMarkdown } from "../helper/write-issue-markdown";
 import { log } from "@clack/prompts";
@@ -14,6 +15,41 @@ import type { TextareaCreateOptions } from "../helper/textarea-options";
 export interface SelectMaterial {
   name: string;
   fileName: string;
+}
+
+function getAssignableUsers() {
+  const { checkResultReturn, createNg, createOk } = resultUtility;
+
+  const repo = checkResultReturn({
+    fn: () =>
+      execFileSync("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      }).trim(),
+    err: (e) => createNg(new Error(`error:${e}`)),
+  });
+
+  if (repo.isErr) {
+    return repo;
+  }
+
+  if (repo.value.length === 0) {
+    return createOk([]);
+  }
+
+  const list = checkResultReturn({
+    fn: () =>
+      execFileSync("gh", ["api", `repos/${repo.value}/assignees`, "--jq", ".[].login"], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      })
+        .trim()
+        .split("\n")
+        .filter(Boolean),
+    err: (e) => createNg(`error: ${e}`),
+  });
+
+  return list;
 }
 
 export async function createIssueAction(options: TextareaCreateOptions = {}) {
@@ -99,6 +135,35 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
 
     if (contentResult.value.isSome) {
       issueContents.push(contentResult.value.value);
+    }
+  }
+
+  const assignees = getAssignableUsers();
+
+  if (assignees.isErr) {
+    throw assignees.err;
+  }
+
+  if (assignees.value.length > 0) {
+    const assigneeResult = await multiselectPrompts<string>({
+      message: "Select assignees",
+      required: false,
+      options: assignees.value.map((assignee) => ({
+        title: assignee,
+        value: assignee,
+      })),
+    });
+
+    if (assigneeResult.isErr) {
+      log.error(`Error: ${assigneeResult.err.message}`);
+      process.exit(1);
+    }
+
+    if (assigneeResult.value.length > 0) {
+      issueContents.push({
+        title: "assign",
+        contents: assigneeResult.value.join(","),
+      });
     }
   }
 

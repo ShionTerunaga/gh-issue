@@ -1,11 +1,13 @@
 import { existsSync, writeFileSync } from "node:fs";
-import { copyFile, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { basename } from "node:path";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 
+import { parseDraftIssue } from "../src/helper/draft-issue";
 import { editTextareaWithVim } from "../src/helper/textarea-editor";
+import { createIssueMarkdown } from "../src/helper/write-issue-markdown";
 import { main } from "../src/index";
 import { createIssueTemplate, createIssueTemplateYaml, initIssueTemplates } from "../src/templates";
 
@@ -172,5 +174,68 @@ describe("editTextareaWithVim", () => {
     expect(result.value).toBe("Edited in vim");
     expect(basename(openedEditorPath)).toMatch(/^\.gh-issue-.*\.md$/);
     expect(existsSync(openedEditorPath)).toBe(false);
+  });
+});
+
+describe("createIssueMarkdown", () => {
+  it("writes assign after title in front matter", () => {
+    const result = createIssueMarkdown([
+      { title: "title", contents: "Issue title" },
+      { title: "assign", contents: "octocat,hubot" },
+      { title: "Details", contents: "Body text" },
+    ]);
+
+    expect(result.isOk).toBe(true);
+
+    if (result.isErr) {
+      throw result.err;
+    }
+
+    expect(result.value).toContain("---\ntitle: Issue title\nassign: octocat,hubot\n---");
+    expect(result.value).toContain("## Details\n\nBody text");
+  });
+
+  it("omits assign when no assignee is selected", () => {
+    const result = createIssueMarkdown([
+      { title: "title", contents: "Issue title" },
+      { title: "Details", contents: "Body text" },
+    ]);
+
+    expect(result.isOk).toBe(true);
+
+    if (result.isErr) {
+      throw result.err;
+    }
+
+    expect(result.value).toContain("---\ntitle: Issue title\n---");
+    expect(result.value).not.toContain("assign:");
+  });
+});
+
+describe("parseDraftIssue", () => {
+  it("reads assign from front matter when present", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "gh-issue-"));
+    const filePath = join(cwd, ".gh-issue", "draft.md");
+
+    await mkdir(join(cwd, ".gh-issue"), { recursive: true });
+    await writeFile(
+      filePath,
+      [
+        "---",
+        "title: Issue title",
+        "assign: octocat, hubot",
+        "---",
+        "",
+        "## Details",
+        "",
+        "Body",
+      ].join("\n"),
+    );
+
+    const issue = parseDraftIssue(".gh-issue/draft.md", cwd);
+
+    expect(issue.title).toBe("Issue title");
+    expect(issue.assignees).toEqual(["octocat", "hubot"]);
+    expect(issue.body).toBe("## Details\n\nBody");
   });
 });
