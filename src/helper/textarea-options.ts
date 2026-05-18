@@ -1,4 +1,4 @@
-import { Option, optionUtility } from "ts-shared";
+import { Option, optionUtility } from "ts-utility-kit";
 
 export type TextareaEditorMode = "vim" | "direct";
 

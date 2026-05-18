@@ -1,7 +1,7 @@
 import fastGlob from "fast-glob";
 import { copyFile, mkdir } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
-import { Result, resultUtility } from "ts-shared";
+import { Result, resultUtility } from "ts-utility-kit";
 
 interface CopyOptions {
   cwd?: string;

@@ -1,4 +1,4 @@
-import { Result, resultUtility, type Option } from "ts-shared";
+import { Result, resultUtility, type Option } from "ts-utility-kit";
 import { createPromptError } from "../shared/error";
 import { cancel, confirm, isCancel } from "@clack/prompts";
 import { multiselectPrompts, type PromptOption } from "./common";
@@ -38,7 +38,9 @@ const languageChoices: PromptOption<Language>[] = [
   },
 ];
 
-export async function selectIssueTemplateTypes(): Promise<Result<IssueTemplateType[], Error>> {
+export async function selectIssueTemplateTypes(): Promise<
+  Result<IssueTemplateType[], Error>
+> {
   return await multiselectPrompts({
     message: "Select issue template types",
     options: issueTemplateTypeChoices,
@@ -64,7 +66,8 @@ export async function confirmInit(): Promise<Result<boolean, Error>> {
       await confirm({
         message: `This will create issue templates in .github/ISSUE_TEMPLATE. Do you want to continue?`,
       }),
-    err: (e) => createNg(createPromptError("Failed to get user confirmation", e)),
+    err: (e) =>
+      createNg(createPromptError("Failed to get user confirmation", e)),
   });
 
   if (response.isErr) {
@@ -79,7 +82,9 @@ export async function confirmInit(): Promise<Result<boolean, Error>> {
   return createOk(response.value as boolean);
 }
 
-export async function confirmCreateTemplates(): Promise<Result<boolean, Error>> {
+export async function confirmCreateTemplates(): Promise<
+  Result<boolean, Error>
+> {
   const { checkPromiseReturn, createNg, createOk } = resultUtility;
 
   const response = await checkPromiseReturn({
@@ -87,7 +92,8 @@ export async function confirmCreateTemplates(): Promise<Result<boolean, Error>> 
       await confirm({
         message: `Do you want to create issue templates in .github/ISSUE_TEMPLATE?`,
       }),
-    err: (e) => createNg(createPromptError("Failed to get user confirmation", e)),
+    err: (e) =>
+      createNg(createPromptError("Failed to get user confirmation", e)),
   });
 
   if (response.isErr) {

@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { readFile, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Result, resultUtility } from "ts-shared";
+import { Result, resultUtility } from "ts-utility-kit";
 
 const COMMENT_START = "<!-- gh-issue:";
 const COMMENT_END = "-->";
@@ -68,8 +68,13 @@ export async function editTextareaWithVim({
   title?: string;
   description?: string;
 }): Promise<Result<string, Error>> {
-  const { checkPromiseReturn, checkPromiseVoid, createNg, createOk, checkResultVoid } =
-    resultUtility;
+  const {
+    checkPromiseReturn,
+    checkPromiseVoid,
+    createNg,
+    createOk,
+    checkResultVoid,
+  } = resultUtility;
   const filePath = createHiddenFilePath();
 
   try {

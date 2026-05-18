@@ -1,8 +1,10 @@
-import { Result } from "ts-shared";
+import { Result } from "ts-utility-kit";
 import { SelectMaterial } from "../action/create";
 import { selectPrompts } from "./common";
 
-export async function selectTemplate(templates: SelectMaterial[]): Promise<Result<string, Error>> {
+export async function selectTemplate(
+  templates: SelectMaterial[],
+): Promise<Result<string, Error>> {
   return await selectPrompts({
     message: "Select an issue template",
     options: templates.map((tmp) => ({

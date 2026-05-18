@@ -8,7 +8,7 @@ import {
   settings,
   text,
 } from "@clack/prompts";
-import { Result, resultUtility } from "ts-shared";
+import { Result, resultUtility } from "ts-utility-kit";
 import { createPromptError } from "../shared/error";
 import { bold } from "picocolors";
 
@@ -160,7 +160,9 @@ export async function multiselectPrompts<T extends PromptValue>({
 }): Promise<Result<T[], Error>> {
   const { createNg, createOk, checkPromiseReturn } = resultUtility;
 
-  const initialValues = options.filter((option) => option.selected).map((option) => option.value);
+  const initialValues = options
+    .filter((option) => option.selected)
+    .map((option) => option.value);
 
   const result = await checkPromiseReturn({
     fn: async () =>
