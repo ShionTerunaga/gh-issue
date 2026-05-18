@@ -31,16 +31,10 @@ const fileNameNouns = [
   "wind",
 ];
 
-export function createIssueMarkdown(
-  issueContents: IssueContents[],
-): Result<string, Error> {
+export function createIssueMarkdown(issueContents: IssueContents[]): Result<string, Error> {
   const { createNg, createOk } = resultUtility;
-  const titleContent = issueContents.find(
-    (content) => content.title === TITLE_KEY,
-  );
-  const assignContent = issueContents.find(
-    (content) => content.title === ASSIGN_KEY,
-  );
+  const titleContent = issueContents.find((content) => content.title === TITLE_KEY);
+  const assignContent = issueContents.find((content) => content.title === ASSIGN_KEY);
 
   if (!titleContent) {
     return createNg(new Error("Title content is required"));
@@ -86,8 +80,7 @@ export async function writeIssueMarkdown(
   }
 
   const mkdirResult = await checkPromiseReturn({
-    fn: async () =>
-      optionConversion(await mkdir(ghIssueDir, { recursive: true })),
+    fn: async () => optionConversion(await mkdir(ghIssueDir, { recursive: true })),
     err: (error) => createNg(error as Error),
   });
 
@@ -101,9 +94,7 @@ export async function writeIssueMarkdown(
 
     const writeResult = await checkPromiseReturn({
       fn: async () =>
-        optionConversion(
-          await writeFile(filePath, markdownResult.value, { flag: "wx" }),
-        ),
+        optionConversion(await writeFile(filePath, markdownResult.value, { flag: "wx" })),
       err: (error) => createNg(error as Error),
     });
 

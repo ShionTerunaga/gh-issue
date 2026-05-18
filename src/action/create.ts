@@ -22,14 +22,10 @@ function getAssignableUsers() {
 
   const repo = checkResultReturn({
     fn: () =>
-      execFileSync(
-        "gh",
-        ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"],
-        {
-          encoding: "utf8",
-          stdio: ["ignore", "pipe", "pipe"],
-        },
-      ).trim(),
+      execFileSync("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      }).trim(),
     err: (e) => createNg(new Error(`error:${e}`)),
   });
 
@@ -43,14 +39,10 @@ function getAssignableUsers() {
 
   const list = checkResultReturn({
     fn: () =>
-      execFileSync(
-        "gh",
-        ["api", `repos/${repo.value}/assignees`, "--jq", ".[].login"],
-        {
-          encoding: "utf8",
-          stdio: ["ignore", "pipe", "pipe"],
-        },
-      )
+      execFileSync("gh", ["api", `repos/${repo.value}/assignees`, "--jq", ".[].login"], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      })
         .trim()
         .split("\n")
         .filter(Boolean),
@@ -66,9 +58,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   const ghIssueDir = join(process.cwd(), ".gh-issue");
 
   if (!existsSync(ghIssueDir)) {
-    log.error(
-      ".gh-issue directory does not exist. Please run `gh-issue init` first.",
-    );
+    log.error(".gh-issue directory does not exist. Please run `gh-issue init` first.");
     process.exit(1);
   }
 
@@ -91,12 +81,10 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     process.exit(1);
   }
 
-  const selectedMaterial: SelectMaterial[] = templateContents.value.map(
-    (tmp) => ({
-      name: tmp.name,
-      fileName: tmp.fileName,
-    }),
-  );
+  const selectedMaterial: SelectMaterial[] = templateContents.value.map((tmp) => ({
+    name: tmp.name,
+    fileName: tmp.fileName,
+  }));
 
   const selectedTemplate = await selectTemplate(selectedMaterial);
 
@@ -106,9 +94,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   }
 
   const foundTemplate = optionConversion(
-    templateContents.value.find(
-      (tmp) => tmp.fileName === selectedTemplate.value,
-    ),
+    templateContents.value.find((tmp) => tmp.fileName === selectedTemplate.value),
   );
 
   if (foundTemplate.isNone) {

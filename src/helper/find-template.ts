@@ -7,9 +7,7 @@ export function findTemplates() {
   const githubDir = join(process.cwd(), ".github", "ISSUE_TEMPLATE");
 
   if (!existsSync(githubDir)) {
-    return createNg(
-      new Error(".github/ISSUE_TEMPLATE directory does not exist"),
-    );
+    return createNg(new Error(".github/ISSUE_TEMPLATE directory does not exist"));
   }
 
   const templates = readdirSync(githubDir, { withFileTypes: true })
@@ -17,9 +15,7 @@ export function findTemplates() {
     .map((entry) => entry.name);
 
   if (templates.length === 0) {
-    return createNg(
-      new Error("No issue templates found in .github/ISSUE_TEMPLATE"),
-    );
+    return createNg(new Error("No issue templates found in .github/ISSUE_TEMPLATE"));
   }
 
   return createOk(templates);
