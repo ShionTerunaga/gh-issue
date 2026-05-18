@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.8.0
+
+### Minor Changes
+
+- [`d750049`](https://github.com/ShionTerunaga/gh-issue/commit/d750049639a63d91316dc474e700c4d7e78e1e2e) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Since ts-shard has been deprecated, we have switched to ts-utility-kit.
+
 ## 0.7.0
 
 ### Minor Changes
