@@ -1,9 +1,7 @@
 import { Result } from "ts-utility-kit";
 import { multiselectPrompts } from "./common";
 
-export async function selectDraftIssues(
-  draftFiles: string[],
-): Promise<Result<string[], Error>> {
+export async function selectDraftIssues(draftFiles: string[]): Promise<Result<string[], Error>> {
   return await multiselectPrompts({
     message: "Select issue drafts to send",
     options: draftFiles.map((filePath) => ({
