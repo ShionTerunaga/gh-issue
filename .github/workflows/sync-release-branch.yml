@@ -89,7 +89,7 @@ jobs:
             license: pkg.license,
             repository: pkg.repository,
             bin: pkg.bin,
-            files: ["dist", "LICENSE"],
+            files: ["dist", "README.md", "LICENSE"],
             type: pkg.type,
             main: pkg.main,
             exports: pkg.exports,
@@ -102,7 +102,7 @@ jobs:
           NODE
 
           cp -R dist "$release_dir/dist"
-          cp CHANGELOG.md LICENSE package.json "$release_dir/"
+          cp CHANGELOG.md LICENSE README.md package.json "$release_dir/"
 
           git rm -r -f --ignore-unmatch .
           cp -R "$release_dir"/. .
@@ -114,7 +114,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add -A
-          git add -f dist CHANGELOG.md LICENSE package.json
+          git add -f dist CHANGELOG.md LICENSE README.md package.json
 
           if git diff --cached --quiet; then
             echo "No release branch changes."

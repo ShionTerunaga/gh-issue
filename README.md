@@ -1,8 +1,8 @@
-# gh-issue
+# gh-issue-kit
 
 A command line tool for setting up GitHub Issue templates and drafting issues from those templates.
 
-`gh-issue` helps you:
+`gh-issue-kit` helps you:
 
 - initialize `.github/ISSUE_TEMPLATE`
 - manage a local `.gh-issue/` workspace
@@ -16,34 +16,34 @@ A command line tool for setting up GitHub Issue templates and drafting issues fr
 
 ## Authentication
 
-Authenticate GitHub CLI before using `gh-issue`:
+Authenticate GitHub CLI before using `gh-issue-kit`:
 
 ```sh
 gh auth login
 ```
 
-This is required because `gh-issue` uses `gh` to inspect repositories and create issues.
+This is required because `gh-issue-kit` uses `gh` to inspect repositories and create issues.
 
 ## Installation
 
 ### Global installation
 
-If you want to run `gh-issue` directly from your terminal, install it globally:
+If you want to run `gh-issue-kit` directly from your terminal, install it globally:
 
 ```sh
-npm install -g github:ShionTerunaga/gh-issue#release
+npm install -g gh-issue-kit
 ```
 
 Or with pnpm:
 
 ```sh
-pnpm add -g github:ShionTerunaga/gh-issue#release
+pnpm add -g gh-issue-kit
 ```
 
 After that, you can run:
 
 ```sh
-gh-issue --help
+gh-issue-kit --help
 ```
 
 ### Local installation
@@ -51,7 +51,7 @@ gh-issue --help
 If you prefer to install it in a project:
 
 ```sh
-npm install github:ShionTerunaga/gh-issue#release
+npm install gh-issue-kit
 ```
 
 Example `package.json` scripts:
@@ -59,16 +59,16 @@ Example `package.json` scripts:
 ```json
 {
   "scripts": {
-    "gh-init": "gh-issue init",
-    "gh-create": "gh-issue create",
-    "gh-send": "gh-issue send"
+    "gh-init": "gh-issue-kit init",
+    "gh-create": "gh-issue-kit create",
+    "gh-send": "gh-issue-kit send"
   }
 }
 ```
 
 ## Commands
 
-### `gh-issue init`
+### `gh-issue-kit init`
 
 Initialize the local `gh-issue` workspace.
 
@@ -88,7 +88,7 @@ Behavior:
 Example:
 
 ```sh
-gh-issue init
+gh-issue-kit init
 ```
 
 Generated template files are written under:
@@ -103,7 +103,7 @@ The local draft workspace is:
 .gh-issue/
 ```
 
-### `gh-issue create`
+### `gh-issue-kit create`
 
 Create a Markdown issue draft from one of the installed issue templates.
 
@@ -117,7 +117,7 @@ This command:
 Example:
 
 ```sh
-gh-issue create
+gh-issue-kit create
 ```
 
 #### `create` options
@@ -134,7 +134,7 @@ Behavior:
 Example:
 
 ```sh
-gh-issue create --vim
+gh-issue-kit create --vim
 ```
 
 ##### `--no-vim`
@@ -149,7 +149,7 @@ Behavior:
 Example:
 
 ```sh
-gh-issue create --no-vim
+gh-issue-kit create --no-vim
 ```
 
 #### Textarea behavior
@@ -165,7 +165,7 @@ When Vim is used:
 - guide comments are inserted at the top
 - those guide comments are removed before saving the final draft
 
-### `gh-issue send`
+### `gh-issue-kit send`
 
 Create GitHub Issues from Markdown drafts stored in `.gh-issue/`.
 
@@ -179,7 +179,7 @@ This command:
 Example:
 
 ```sh
-gh-issue send
+gh-issue-kit send
 ```
 
 #### `send` options
@@ -191,7 +191,7 @@ Send all drafts without showing the selection prompt.
 Example:
 
 ```sh
-gh-issue send --all
+gh-issue-kit send --all
 ```
 
 The `send` command ignores:
@@ -219,10 +219,10 @@ The build fails when running the release workflow.
 ## Typical workflow
 
 1. Run `gh auth login`
-2. Run `gh-issue init`
-3. Run `gh-issue create`
+2. Run `gh-issue-kit init`
+3. Run `gh-issue-kit create`
 4. Review the draft in `.gh-issue/`
-5. Run `gh-issue send`
+5. Run `gh-issue-kit send`
 
 ## Notes
 

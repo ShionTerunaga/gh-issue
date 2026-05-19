@@ -58,7 +58,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   const ghIssueDir = join(process.cwd(), ".gh-issue");
 
   if (!existsSync(ghIssueDir)) {
-    log.error(".gh-issue directory does not exist. Please run `gh-issue init` first.");
+    log.error(".gh-issue directory does not exist. Please run `gh-issue-kit init` first.");
     process.exit(1);
   }
 

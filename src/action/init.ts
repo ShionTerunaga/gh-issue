@@ -38,7 +38,7 @@ export async function initAction() {
     await mkdir(ghIssueDir, { recursive: true });
 
     if (!existsSync(ghIssueReadmePath)) {
-      await writeFile(ghIssueReadmePath, `# gh-issue\n\nThis directory is managed by gh-issue.`);
+      await writeFile(ghIssueReadmePath, `# gh-issue-kit\n\nThis directory is managed by gh-issue-kit.`);
     }
 
     outro("All done!");
@@ -128,7 +128,7 @@ export async function initAction() {
   await mkdir(ghIssueDir, { recursive: true });
 
   if (!existsSync(ghIssueReadmePath)) {
-    await writeFile(ghIssueReadmePath, `# gh-issue\n\nThis directory is managed by gh-issue.`);
+    await writeFile(ghIssueReadmePath, `# gh-issue-kit\n\nThis directory is managed by gh-issue-kit.`);
   }
 
   outro("All done!");
