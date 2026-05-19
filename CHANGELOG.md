@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.9.0
+
+### Minor Changes
+
+- [`9e207c9`](https://github.com/ShionTerunaga/gh-issue/commit/9e207c9d2f0a50a332d6eb93f8f8b0a585cdf9b4) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Rename the package
+
 ## 0.8.1
 
 ### Patch Changes
