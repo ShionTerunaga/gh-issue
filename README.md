@@ -40,12 +40,6 @@ Or with pnpm:
 pnpm add -g gh-issue-kit
 ```
 
-After that, you can run:
-
-```sh
-gh-issue-kit --help
-```
-
 ### Local installation
 
 If you prefer to install it in a project:
