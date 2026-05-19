@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.8.1
+
+### Patch Changes
+
+- [#57](https://github.com/ShionTerunaga/gh-issue/pull/57) [`b5811f9`](https://github.com/ShionTerunaga/gh-issue/commit/b5811f953260ac12ca276999265e1cdd232aab6d) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Delete ts-shard remnants
+
 ## 0.8.0
 
 ### Minor Changes
