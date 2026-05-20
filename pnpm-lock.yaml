@@ -17,9 +17,6 @@ importers:
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
-      gh-issue-kit:
-        specifier: ^0.9.0
-        version: 0.9.0
       js-yaml:
         specifier: ^4.1.1
         version: 4.1.1
@@ -1196,11 +1193,6 @@ packages:
 
   get-tsconfig@4.14.0:
     resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
-
-  gh-issue-kit@0.9.0:
-    resolution: {integrity: sha512-U/6kIgyELkrUBBGlpVIsN3pA6LgxzEBPEK0QdUyoAJLM+/AHeKGROJQiHg5mOc5QC7LUVWhM6GvbFtIo9xTccQ==}
-    engines: {node: '>=20'}
-    hasBin: true
 
   git-raw-commits@5.0.1:
     resolution: {integrity: sha512-Y+csSm2GD/PCSh6Isd/WiMjNAydu0VBiG9J7EdQsNA5P9uXvLayqjmTsNlK5Gs9IhblFZqOU0yid5Il5JPoLiQ==}
@@ -2847,11 +2839,6 @@ snapshots:
   get-tsconfig@4.14.0:
     dependencies:
       resolve-pkg-maps: 1.0.0
-
-  gh-issue-kit@0.9.0:
-    dependencies:
-      commander: 14.0.3
-      fast-glob: 3.3.3
 
   git-raw-commits@5.0.1(conventional-commits-parser@6.4.0):
     dependencies:

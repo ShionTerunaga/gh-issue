@@ -40,16 +40,12 @@
     "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build",
     "prepack": "pnpm build",
     "initial": "lefthook install",
-    "version:packages": "changeset version",
-    "gh-init": "gh-issue-kit init",
-    "gh-create": "gh-issue-kit create",
-    "gh-send": "gh-issue-kit send"
+    "version:packages": "changeset version"
   },
   "dependencies": {
     "@clack/prompts": "^1.3.0",
     "commander": "^14.0.3",
     "fast-glob": "^3.3.3",
-    "gh-issue-kit": "^0.10.0",
     "js-yaml": "^4.1.1",
     "picocolors": "^1.1.1",
     "ts-utility-kit": "^1.4.0",
