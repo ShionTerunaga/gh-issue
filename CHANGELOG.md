@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.9.1
+
+### Patch Changes
+
+- [#67](https://github.com/ShionTerunaga/gh-issue/pull/67) [`5391bac`](https://github.com/ShionTerunaga/gh-issue/commit/5391bac8b3a6da5e51fe39054a76f7777e95f9c6) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Changes to the Development Environment
+
 ## 0.9.0
 
 ### Minor Changes
