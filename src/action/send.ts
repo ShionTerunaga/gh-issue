@@ -22,8 +22,17 @@ function resolveRepository() {
   return runGh(["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]);
 }
 
-function createIssueWithGh(issue: { title: string; body: string; assignees?: string[] }) {
+function createIssueWithGh(issue: {
+  title: string;
+  body: string;
+  labels?: string[];
+  assignees?: string[];
+}) {
   const args = ["issue", "create", "--title", issue.title, "--body", issue.body];
+
+  if (issue.labels && issue.labels.length > 0) {
+    args.push("--label", issue.labels.join(","));
+  }
 
   if (issue.assignees && issue.assignees.length > 0) {
     args.push("--assignee", issue.assignees.join(","));
