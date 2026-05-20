@@ -9,11 +9,7 @@ import { parseDraftIssue } from "../src/helper/draft-issue";
 import { editTextareaWithVim } from "../src/helper/textarea-editor";
 import { createIssueMarkdown } from "../src/helper/write-issue-markdown";
 import { main } from "../src/index";
-import {
-  createIssueTemplate,
-  createIssueTemplateYaml,
-  initIssueTemplates,
-} from "../src/templates";
+import { createIssueTemplate, createIssueTemplateYaml, initIssueTemplates } from "../src/templates";
 
 let openedEditorPath = "";
 const compatibilityTemplatePaths = [
