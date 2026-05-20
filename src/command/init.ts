@@ -1,4 +1,5 @@
-import { Result, resultUtility, type Option } from "ts-utility-kit";
+import { resultUtility } from "ts-utility-kit";
+import type { Option, Result } from "ts-utility-kit";
 import { createPromptError } from "../shared/error";
 import { cancel, confirm, isCancel } from "@clack/prompts";
 import { multiselectPrompts, type PromptOption } from "./common";

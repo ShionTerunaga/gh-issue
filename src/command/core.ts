@@ -1,12 +1,11 @@
 import { Command } from "commander";
-import { type InitialReturnValue } from "prompts";
 import { initAction } from "../action/init";
 import { createIssueAction } from "../action/create";
 import { sendIssueAction } from "../action/send";
 import { addTemplateAction } from "../action/add";
 
 export const onPromptState = (state: {
-  value: InitialReturnValue;
+  value: unknown;
   aborted: boolean;
   exited: boolean;
 }) => {

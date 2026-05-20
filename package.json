@@ -12,7 +12,7 @@
     "url": "git+https://github.com/ShionTerunaga/gh-issue.git"
   },
   "bin": {
-    "gh-issue-kit": "./dist/index.mjs"
+    "gh-issue-kit": "./dist/index.js"
   },
   "files": [
     "dist",
@@ -20,15 +20,15 @@
     "LICENSE"
   ],
   "type": "module",
-  "main": "./dist/index.mjs",
-  "exports": "./dist/index.mjs",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "vite build && pnpm copy:template",
-    "start": "pnpm build && node dist/index.mjs",
+    "build": "rm -rf dist && rolldown -c rolldown.config.ts && pnpm copy:template",
+    "start": "pnpm build && node dist/index.js",
     "changeset": "changeset",
     "copy:template": "node --experimental-strip-types scripts/copy-template.ts",
     "test": "vitest run",
@@ -36,7 +36,8 @@
     "lint:fix": "oxlint --fix .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "check": "pnpm lint && pnpm format:check && pnpm test && pnpm build",
+    "typecheck": "tsgo -p tsconfig.json --noEmit",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build",
     "prepack": "pnpm build",
     "initial": "lefthook install",
     "version:packages": "changeset version",
@@ -46,7 +47,6 @@
   },
   "dependencies": {
     "@clack/prompts": "^1.3.0",
-    "@types/prompts": "^2.4.9",
     "commander": "^14.0.3",
     "fast-glob": "^3.3.3",
     "gh-issue-kit": "^0.9.0",
@@ -62,12 +62,13 @@
     "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
     "@types/node": "25.6.0",
+    "@typescript/native-preview": "beta",
     "lefthook": "^2.1.6",
     "oxfmt": "0.47.0",
     "oxlint": "1.62.0",
+    "rolldown": "^1.0.2",
     "tsx": "4.21.0",
-    "typescript": "6.0.3",
-    "vite": "8.0.10",
+    "typescript": "npm:@typescript/typescript6@^6.0.0",
     "vitest": "4.1.5"
   },
   "engines": {

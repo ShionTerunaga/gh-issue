@@ -1,4 +1,4 @@
-import { IssueContents } from "./create-contents";
+import type { IssueContents } from "./create-contents";
 
 export function parseCheckboxesValue({
   items,

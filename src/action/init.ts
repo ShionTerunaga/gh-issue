@@ -6,10 +6,10 @@ import { copy } from "../helper/copy";
 import {
   confirmCreateTemplates,
   confirmInit,
-  Language,
   selectIssueTemplateTypes,
   selectLanguages,
 } from "../command/init";
+import type { Language } from "../command/init";
 import { cancel, log, outro, spinner } from "@clack/prompts";
 
 interface IssueTemplateMaterial {

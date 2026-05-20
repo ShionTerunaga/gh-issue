@@ -3,7 +3,8 @@ import { randomUUID } from "node:crypto";
 import { readFile, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Result, resultUtility } from "ts-utility-kit";
+import { resultUtility } from "ts-utility-kit";
+import type { Result } from "ts-utility-kit";
 
 const COMMENT_START = "<!-- gh-issue:";
 const COMMENT_END = "-->";
