@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import fastGlob from "fast-glob";
-import { Result, resultUtility } from "ts-utility-kit";
+import { resultUtility } from "ts-utility-kit";
+import type { Result } from "ts-utility-kit";
 
 const DRAFTS_DIR = ".gh-issue";
 const README_FILE = `${DRAFTS_DIR}/README.md`;

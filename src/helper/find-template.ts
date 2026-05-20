@@ -1,8 +1,9 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "path";
 import { resultUtility } from "ts-utility-kit";
+import type { Result } from "ts-utility-kit";
 
-export function findTemplates() {
+export function findTemplates(): Result<string[], Error> {
   const { createNg, createOk } = resultUtility;
   const githubDir = join(process.cwd(), ".github", "ISSUE_TEMPLATE");
 

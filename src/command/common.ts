@@ -8,7 +8,8 @@ import {
   settings,
   text,
 } from "@clack/prompts";
-import { Result, resultUtility } from "ts-utility-kit";
+import { resultUtility } from "ts-utility-kit";
+import type { Result } from "ts-utility-kit";
 import { createPromptError } from "../shared/error";
 import { bold } from "picocolors";
 
@@ -44,8 +45,8 @@ export async function textPrompts({
   placeholder?: string;
   cancelMessage?: string;
   errorMessage?: string;
-}) {
-  const { checkPromiseReturn, createNg } = resultUtility;
+}): Promise<Result<string, Error>> {
+  const { checkPromiseReturn, createNg, createOk } = resultUtility;
 
   const result = await checkPromiseReturn({
     fn: async () =>
@@ -65,7 +66,7 @@ export async function textPrompts({
     process.exit(0);
   }
 
-  return result;
+  return createOk(result.value as string);
 }
 
 export async function multilineTextPrompts({
@@ -78,8 +79,8 @@ export async function multilineTextPrompts({
   placeholder?: string;
   cancelMessage?: string;
   errorMessage?: string;
-}) {
-  const { checkPromiseReturn, createNg } = resultUtility;
+}): Promise<Result<string, Error>> {
+  const { checkPromiseReturn, createNg, createOk } = resultUtility;
 
   log.message(`${bold("To send, press the Tab key and then press Enter.")}\n`);
 
@@ -106,7 +107,7 @@ export async function multilineTextPrompts({
     process.exit(0);
   }
 
-  return result;
+  return createOk(result.value as string);
 }
 
 export async function selectPrompts<T extends PromptValue>({

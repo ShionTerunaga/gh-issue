@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { run } from "./run";
 
 export { createIssueTemplate, createIssueTemplateYaml, initIssueTemplates } from "./templates";

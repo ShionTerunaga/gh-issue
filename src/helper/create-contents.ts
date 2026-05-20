@@ -1,13 +1,14 @@
-import { Option, optionUtility, Result, resultUtility } from "ts-utility-kit";
-import { IssueFormElement } from "./issue-tyepe";
+import { optionUtility, resultUtility } from "ts-utility-kit";
+import type { Option, Result } from "ts-utility-kit";
+import type { IssueFormElement } from "./issue-tyepe";
 import { blue, bold, red } from "picocolors";
 import {
   multilineTextPrompts,
   multiselectPrompts,
-  PromptOption,
   selectPrompts,
   textPrompts,
 } from "../command/common";
+import type { PromptOption } from "../command/common";
 import { parseCheckboxesValue } from "./checkboxes-parser";
 import { log } from "@clack/prompts";
 import { editTextareaWithVim } from "./textarea-editor";

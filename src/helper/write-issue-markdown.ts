@@ -1,8 +1,9 @@
 import { randomInt } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { optionUtility, Result, resultUtility } from "ts-utility-kit";
-import { IssueContents } from "./create-contents";
+import { optionUtility, resultUtility } from "ts-utility-kit";
+import type { Result } from "ts-utility-kit";
+import type { IssueContents } from "./create-contents";
 
 const TITLE_KEY = "title";
 const ASSIGN_KEY = "assign";

@@ -1,5 +1,5 @@
-import { Result } from "ts-utility-kit";
-import { SelectMaterial } from "../action/create";
+import type { Result } from "ts-utility-kit";
+import type { SelectMaterial } from "../action/create";
 import { selectPrompts } from "./common";
 
 export async function selectTemplate(templates: SelectMaterial[]): Promise<Result<string, Error>> {
