@@ -1,16 +1,5 @@
 # gh-issue
 
-## 0.10.0
-
-### Minor Changes
-
-- [#61](https://github.com/ShionTerunaga/gh-issue/pull/61) [`c242852`](https://github.com/ShionTerunaga/gh-issue/commit/c242852c7c73144668091b71bb8e764d861f6cc9) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - I realized that `vite` wasn't necessary, so I switched to `rolldown`.
-
-### Patch Changes
-
-- Updated dependencies [[`c242852`](https://github.com/ShionTerunaga/gh-issue/commit/c242852c7c73144668091b71bb8e764d861f6cc9)]:
-  - gh-issue-kit@0.10.0
-
 ## 0.9.0
 
 ### Minor Changes
