@@ -12,11 +12,11 @@ What happened, and what did you expect to happen instead?
 
 ## Version
 
-- 
+-
 
 ## Browser
 
-- 
+-
 
 ## Relevant log output
 

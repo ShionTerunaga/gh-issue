@@ -4,11 +4,7 @@ import { createIssueAction } from "../action/create";
 import { sendIssueAction } from "../action/send";
 import { addTemplateAction } from "../action/add-tmp";
 
-export const onPromptState = (state: {
-  value: unknown;
-  aborted: boolean;
-  exited: boolean;
-}) => {
+export const onPromptState = (state: { value: unknown; aborted: boolean; exited: boolean }) => {
   if (state.aborted) {
     process.stdout.write("\x1B[?25h");
     process.stdout.write("\n");
@@ -17,9 +13,7 @@ export const onPromptState = (state: {
 };
 
 export function createCommander() {
-  const program = new Command()
-    .description("Create GitHub issue templates")
-    .version("0.0.0");
+  const program = new Command().description("Create GitHub issue templates").version("0.0.0");
 
   program
     .command("init")

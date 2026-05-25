@@ -94,8 +94,9 @@ describe("createIssueTemplateYaml", () => {
   });
 
   it("ships bundled markdown templates alongside YAML templates", async () => {
-    await expect(readFile(join(process.cwd(), "template", "en", "bug_report_en.md"), "utf8")).resolves
-      .toContain("## Summary");
+    await expect(
+      readFile(join(process.cwd(), "template", "en", "bug_report_en.md"), "utf8"),
+    ).resolves.toContain("## Summary");
     await expect(
       readFile(join(process.cwd(), "template", "ja", "feature_request_ja.md"), "utf8"),
     ).resolves.toContain("## 背景とユーザーストーリー");
