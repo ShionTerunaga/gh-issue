@@ -85,12 +85,16 @@ export async function numberPrompts({
   required = true,
   cancelMessage = "Selection canceled.",
   errorMessage = "Failed to enter a number",
+  min,
+  max,
 }: {
   message: string;
   placeholder?: string;
   required?: boolean;
   cancelMessage?: string;
   errorMessage?: string;
+  min?: number;
+  max?: number;
 }): Promise<Result<Option<number>, Error>> {
   const { checkPromiseReturn, createNg, createOk } = resultUtility;
   const { createNone, createSome } = optionUtility;
@@ -113,7 +117,21 @@ export async function numberPrompts({
 
           const parsedValue = Number(trimmed);
 
-          return Number.isInteger(parsedValue) ? undefined : "Enter a whole number";
+          if (!Number.isInteger(parsedValue)) {
+            return "Enter a whole number";
+          }
+
+          if (min !== undefined && parsedValue < min) {
+            return `Please enter a number greater than or equal to ${min}`;
+          }
+
+          if (max !== undefined && parsedValue > max) {
+            return `Please enter a number less than or equal to ${max}`;
+          }
+
+          return Number.isInteger(parsedValue)
+            ? undefined
+            : "Enter a whole number";
         },
       }),
     err: (e) => createNg(createPromptError(errorMessage, e)),
@@ -244,7 +262,9 @@ export async function multiselectPrompts<T extends PromptValue>({
 }): Promise<Result<T[], Error>> {
   const { createNg, createOk, checkPromiseReturn } = resultUtility;
 
-  const initialValues = options.filter((option) => option.selected).map((option) => option.value);
+  const initialValues = options
+    .filter((option) => option.selected)
+    .map((option) => option.value);
 
   const result = await checkPromiseReturn({
     fn: async () =>
