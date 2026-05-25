@@ -223,9 +223,7 @@ async function promptInputElement(usedIds: Set<string>) {
     attributes: {
       label: metadata.value.label,
       description: metadata.value.description,
-      placeholder: placeholder.value.isSome
-        ? placeholder.value.value
-        : undefined,
+      placeholder: placeholder.value.isSome ? placeholder.value.value : undefined,
       value: value.value.isSome ? value.value.value : undefined,
     },
     validations: {
@@ -268,9 +266,7 @@ async function promptTextareaElement(usedIds: Set<string>) {
     attributes: {
       label: metadata.value.label,
       description: metadata.value.description,
-      placeholder: placeholder.value.isSome
-        ? placeholder.value.value
-        : undefined,
+      placeholder: placeholder.value.isSome ? placeholder.value.value : undefined,
       value: value.value.isSome ? value.value.value : undefined,
       render: render.value.length > 0 ? render.value : undefined,
     },
@@ -302,9 +298,7 @@ async function promptDropdownElement(usedIds: Set<string>) {
   const options: string[] = [];
 
   while (true) {
-    const option = await promptRequiredText(
-      `Dropdown option ${options.length + 1}`,
-    );
+    const option = await promptRequiredText(`Dropdown option ${options.length + 1}`);
 
     if (option.isErr) {
       return option;
@@ -338,9 +332,7 @@ async function promptDropdownElement(usedIds: Set<string>) {
     return defaultIndex;
   }
 
-  const parsedDefault = defaultIndex.value.isSome
-    ? defaultIndex.value.value
-    : undefined;
+  const parsedDefault = defaultIndex.value.isSome ? defaultIndex.value.value : undefined;
 
   return resultUtility.createOk<IssueFormElement>({
     type: "dropdown",
@@ -371,9 +363,7 @@ async function promptCheckboxesElement(usedIds: Set<string>) {
   const options: { label: string; required?: boolean }[] = [];
 
   while (true) {
-    const label = await promptRequiredText(
-      `Checkbox option ${options.length + 1}`,
-    );
+    const label = await promptRequiredText(`Checkbox option ${options.length + 1}`);
 
     if (label.isErr) {
       return label;
@@ -500,10 +490,7 @@ async function promptBodyElements() {
  * Builds and writes a custom GitHub issue template file.
  */
 export async function createCustomIssueTemplate(cwd = process.cwd()) {
-  const fileName = await promptRequiredText(
-    "Template file name",
-    "custom_issue",
-  );
+  const fileName = await promptRequiredText("Template file name", "custom_issue");
 
   if (fileName.isErr) {
     return fileName;
@@ -515,17 +502,13 @@ export async function createCustomIssueTemplate(cwd = process.cwd()) {
     return name;
   }
 
-  const description = await promptOptionalLongText(
-    "Add a template description?",
-  );
+  const description = await promptOptionalLongText("Add a template description?");
 
   if (description.isErr) {
     return description;
   }
 
-  const title = await promptOptionalText(
-    "Default issue title prefix (optional)",
-  );
+  const title = await promptOptionalText("Default issue title prefix (optional)");
 
   if (title.isErr) {
     return title;
@@ -545,10 +528,7 @@ export async function createCustomIssueTemplate(cwd = process.cwd()) {
   };
 
   const issueTemplateDir = join(cwd, ".github", "ISSUE_TEMPLATE");
-  const targetPath = join(
-    issueTemplateDir,
-    normalizeTemplateFileName(fileName.value),
-  );
+  const targetPath = join(issueTemplateDir, normalizeTemplateFileName(fileName.value));
 
   if (existsSync(targetPath)) {
     return resultUtility.createNg(new Error(`Already exists ${targetPath}`));
