@@ -1,35 +1,39 @@
 import { log, spinner } from "@clack/prompts";
-import { execFileSync } from "node:child_process";
-import { rmSync } from "node:fs";
+import { execFile } from "node:child_process";
+import { rm } from "node:fs/promises";
 import { join } from "node:path";
+import { promisify } from "node:util";
 import { bold, green } from "picocolors";
 import { findDraftIssues, parseDraftIssue } from "../helper/draft-issue";
 import { selectDraftIssues } from "../command/send";
 import { resultUtility } from "ts-utility-kit";
 
-function runGh(args: string[]) {
-  return execFileSync("gh", args, {
+const execFileAsync = promisify(execFile);
+
+async function runGh(args: string[]) {
+  const { stdout } = await execFileAsync("gh", args, {
     encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-  }).trim();
+  });
+
+  return stdout.trim();
 }
 
-function verifyGhAuth() {
-  runGh(["auth", "status"]);
+async function verifyGhAuth() {
+  await runGh(["auth", "status"]);
 }
 
-function resolveRepository() {
-  return runGh(["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]);
+async function resolveRepository() {
+  return await runGh(["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]);
 }
 
-function createIssueWithGh(issue: { title: string; body: string; assignees?: string[] }) {
+async function createIssueWithGh(issue: { title: string; body: string; assignees?: string[] }) {
   const args = ["issue", "create", "--title", issue.title, "--body", issue.body];
 
   if (issue.assignees && issue.assignees.length > 0) {
     args.push("--assignee", issue.assignees.join(","));
   }
 
-  return runGh(args);
+  return await runGh(args);
 }
 
 export async function sendIssueAction(options: { all?: boolean } = {}) {
@@ -56,8 +60,10 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
     process.exit(1);
   }
 
-  const authResult = checkResultVoid({
-    fn: () => verifyGhAuth(),
+  const authResult = await resultUtility.checkPromiseVoid({
+    fn: async () => {
+      await verifyGhAuth();
+    },
     err: (e) =>
       createNg(
         new Error(
@@ -71,8 +77,8 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
     process.exit(1);
   }
 
-  const repositoryResult = checkResultReturn({
-    fn: () => resolveRepository(),
+  const repositoryResult = await resultUtility.checkPromiseReturn({
+    fn: async () => await resolveRepository(),
     err: (e) =>
       createNg(
         new Error(
@@ -94,8 +100,8 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
     spin.message(`Sending ${selectedDraft}...`);
 
     const issue = parseDraftIssue(selectedDraft);
-    const issueUrl = checkResultReturn({
-      fn: () => createIssueWithGh(issue),
+    const issueUrl = await resultUtility.checkPromiseReturn({
+      fn: async () => await createIssueWithGh(issue),
       err: (e) =>
         createNg(
           new Error(
@@ -109,7 +115,7 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
       process.exit(1);
     }
 
-    rmSync(join(process.cwd(), selectedDraft));
+    await rm(join(process.cwd(), selectedDraft));
     spin.message(`Sent ${selectedDraft}`);
 
     log.success(`${bold(green("Issue created successfully"))}\n${issueUrl.value}\n`);

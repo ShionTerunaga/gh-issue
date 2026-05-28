@@ -1,6 +1,7 @@
-import { execFileSync } from "node:child_process";
+import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { promisify } from "node:util";
 import { optionUtility, resultUtility } from "ts-utility-kit";
 import { findTemplates } from "../helper/find-template";
 import { ymlParse } from "../helper/yml";
@@ -10,7 +11,7 @@ import { multiselectPrompts, textPrompts } from "../command/common";
 import { createContents } from "../helper/create-contents";
 import type { IssueContents } from "../helper/create-contents";
 import { writeIssueMarkdown } from "../helper/write-issue-markdown";
-import { log } from "@clack/prompts";
+import { log, spinner } from "@clack/prompts";
 import type { TextareaCreateOptions } from "../helper/textarea-options";
 
 export interface SelectMaterial {
@@ -18,15 +19,22 @@ export interface SelectMaterial {
   fileName: string;
 }
 
-function getAssignableUsers() {
-  const { checkResultReturn, createNg, createOk } = resultUtility;
+const execFileAsync = promisify(execFile);
 
-  const repo = checkResultReturn({
-    fn: () =>
-      execFileSync("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"], {
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      }).trim(),
+async function runGh(args: string[]) {
+  const { stdout } = await execFileAsync("gh", args, {
+    encoding: "utf8",
+  });
+
+  return stdout.trim();
+}
+
+async function getAssignableUsers() {
+  const { checkPromiseReturn, createNg, createOk } = resultUtility;
+
+  const repo = await checkPromiseReturn({
+    fn: async () =>
+      await runGh(["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]),
     err: (e) => createNg(new Error(`error:${e}`)),
   });
 
@@ -38,12 +46,11 @@ function getAssignableUsers() {
     return createOk([]);
   }
 
-  const list = checkResultReturn({
-    fn: () =>
-      execFileSync("gh", ["api", `repos/${repo.value}/assignees`, "--jq", ".[].login"], {
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      })
+  const list = await checkPromiseReturn({
+    fn: async () =>
+      (
+        await runGh(["api", `repos/${repo.value}/assignees`, "--jq", ".[].login"])
+      )
         .trim()
         .split("\n")
         .filter(Boolean),
@@ -57,6 +64,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   const { checkResultReturn, createNg } = resultUtility;
   const { optionConversion } = optionUtility;
   const ghIssueDir = join(process.cwd(), ".gh-issue");
+  const spin = spinner();
 
   if (!existsSync(ghIssueDir)) {
     log.error(".gh-issue directory does not exist. Please run `gh-issue-kit init` first.");
@@ -139,11 +147,16 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     }
   }
 
-  const assignees = getAssignableUsers();
+  spin.start("Loading assignable users...");
+
+  const assignees = await getAssignableUsers();
 
   if (assignees.isErr) {
+    spin.stop();
     throw assignees.err;
   }
+
+  spin.stop();
 
   if (assignees.value.length > 0) {
     const assigneeResult = await multiselectPrompts<string>({
