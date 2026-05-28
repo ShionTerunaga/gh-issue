@@ -48,9 +48,7 @@ async function getAssignableUsers() {
 
   const list = await checkPromiseReturn({
     fn: async () =>
-      (
-        await runGh(["api", `repos/${repo.value}/assignees`, "--jq", ".[].login"])
-      )
+      (await runGh(["api", `repos/${repo.value}/assignees`, "--jq", ".[].login"]))
         .trim()
         .split("\n")
         .filter(Boolean),
