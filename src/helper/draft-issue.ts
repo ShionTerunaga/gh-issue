@@ -11,6 +11,7 @@ export interface DraftIssue {
   filePath: string;
   title: string;
   body: string;
+  labels?: string[];
   assignees?: string[];
 }
 
@@ -45,6 +46,7 @@ export function parseDraftIssue(filePath: string, cwd = process.cwd()): DraftIss
 
   const [, frontMatter, markdownBody] = frontMatterMatch;
   const titleMatch = frontMatter.match(/^title:\s*(.+)$/m);
+  const labelMatch = frontMatter.match(/^label:\s*(.+)$/m);
   const assignMatch = frontMatter.match(/^assign:\s*(.+)$/m);
 
   if (!titleMatch) {
@@ -55,6 +57,10 @@ export function parseDraftIssue(filePath: string, cwd = process.cwd()): DraftIss
     filePath,
     title: titleMatch[1].trim(),
     body: markdownBody.trim(),
+    labels: labelMatch?.[1]
+      ?.split(",")
+      .map((label) => label.trim())
+      .filter(Boolean),
     assignees: assignMatch?.[1]
       ?.split(",")
       .map((assignee) => assignee.trim())

@@ -188,9 +188,10 @@ describe("editTextareaWithVim", () => {
 });
 
 describe("createIssueMarkdown", () => {
-  it("writes assign after title in front matter", () => {
+  it("writes label and assign after title in front matter", () => {
     const result = createIssueMarkdown([
       { title: "title", contents: "Issue title" },
+      { title: "label", contents: "bug,triage" },
       { title: "assign", contents: "octocat,hubot" },
       { title: "Details", contents: "Body text" },
     ]);
@@ -201,11 +202,13 @@ describe("createIssueMarkdown", () => {
       throw result.err;
     }
 
-    expect(result.value).toContain("---\ntitle: Issue title\nassign: octocat,hubot\n---");
+    expect(result.value).toContain(
+      "---\ntitle: Issue title\nlabel: bug,triage\nassign: octocat,hubot\n---",
+    );
     expect(result.value).toContain("## Details\n\nBody text");
   });
 
-  it("omits assign when no assignee is selected", () => {
+  it("omits label and assign when they are not selected", () => {
     const result = createIssueMarkdown([
       { title: "title", contents: "Issue title" },
       { title: "Details", contents: "Body text" },
@@ -218,12 +221,13 @@ describe("createIssueMarkdown", () => {
     }
 
     expect(result.value).toContain("---\ntitle: Issue title\n---");
+    expect(result.value).not.toContain("label:");
     expect(result.value).not.toContain("assign:");
   });
 });
 
 describe("parseDraftIssue", () => {
-  it("reads assign from front matter when present", async () => {
+  it("reads label and assign from front matter when present", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "gh-issue-"));
     const filePath = join(cwd, ".gh-issue", "draft.md");
 
@@ -233,6 +237,7 @@ describe("parseDraftIssue", () => {
       [
         "---",
         "title: Issue title",
+        "label: bug, triage",
         "assign: octocat, hubot",
         "---",
         "",
@@ -245,6 +250,7 @@ describe("parseDraftIssue", () => {
     const issue = parseDraftIssue(".gh-issue/draft.md", cwd);
 
     expect(issue.title).toBe("Issue title");
+    expect(issue.labels).toEqual(["bug", "triage"]);
     expect(issue.assignees).toEqual(["octocat", "hubot"]);
     expect(issue.body).toBe("## Details\n\nBody");
   });
