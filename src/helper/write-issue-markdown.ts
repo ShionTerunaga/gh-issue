@@ -6,6 +6,7 @@ import type { Result } from "ts-utility-kit";
 import type { IssueContents } from "./create-contents";
 
 const TITLE_KEY = "title";
+const LABEL_KEY = "label";
 const ASSIGN_KEY = "assign";
 const fileNameAdjectives = [
   "ancient",
@@ -35,6 +36,7 @@ const fileNameNouns = [
 export function createIssueMarkdown(issueContents: IssueContents[]): Result<string, Error> {
   const { createNg, createOk } = resultUtility;
   const titleContent = issueContents.find((content) => content.title === TITLE_KEY);
+  const labelContent = issueContents.find((content) => content.title === LABEL_KEY);
   const assignContent = issueContents.find((content) => content.title === ASSIGN_KEY);
 
   if (!titleContent) {
@@ -42,9 +44,14 @@ export function createIssueMarkdown(issueContents: IssueContents[]): Result<stri
   }
 
   const bodyContents = issueContents.filter(
-    (content) => content.title !== TITLE_KEY && content.title !== ASSIGN_KEY,
+    (content) =>
+      content.title !== TITLE_KEY && content.title !== LABEL_KEY && content.title !== ASSIGN_KEY,
   );
   const markdownLines = [`---`, `title: ${titleContent.contents}`];
+
+  if (labelContent && labelContent.contents.trim().length > 0) {
+    markdownLines.push(`label: ${labelContent.contents}`);
+  }
 
   if (assignContent && assignContent.contents.trim().length > 0) {
     markdownLines.push(`assign: ${assignContent.contents}`);

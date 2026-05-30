@@ -18,7 +18,7 @@ export interface SelectMaterial {
   fileName: string;
 }
 
-function getAssignableUsers() {
+function getCurrentRepository() {
   const { checkResultReturn, createNg, createOk } = resultUtility;
 
   const repo = checkResultReturn({
@@ -35,19 +35,43 @@ function getAssignableUsers() {
   }
 
   if (repo.value.length === 0) {
-    return createOk([]);
+    return createOk("");
   }
+
+  return createOk(repo.value);
+}
+
+function getAssignableUsers(repo: string) {
+  const { checkResultReturn, createNg } = resultUtility;
 
   const list = checkResultReturn({
     fn: () =>
-      execFileSync("gh", ["api", `repos/${repo.value}/assignees`, "--jq", ".[].login"], {
+      execFileSync("gh", ["api", `repos/${repo}/assignees`, "--jq", ".[].login"], {
         encoding: "utf8",
         stdio: ["ignore", "pipe", "pipe"],
       })
         .trim()
         .split("\n")
         .filter(Boolean),
-    err: (e) => createNg(`error: ${e}`),
+    err: (e) => createNg(new Error(`error: ${e}`)),
+  });
+
+  return list;
+}
+
+function getAvailableLabels(repo: string) {
+  const { checkResultReturn, createNg } = resultUtility;
+
+  const list = checkResultReturn({
+    fn: () =>
+      execFileSync("gh", ["api", `repos/${repo}/labels`, "--jq", ".[].name"], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      })
+        .trim()
+        .split("\n")
+        .filter(Boolean),
+    err: (e) => createNg(new Error(`error: ${e}`)),
   });
 
   return list;
@@ -139,10 +163,53 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     }
   }
 
-  const assignees = getAssignableUsers();
+  const repository = getCurrentRepository();
+
+  if (repository.isErr) {
+    log.error(`Error: ${repository.err.message}`);
+    process.exit(1);
+  }
+
+  if (repository.value.length > 0) {
+    const availableLabels = getAvailableLabels(repository.value);
+
+    if (availableLabels.isErr) {
+      log.error(`Error: ${availableLabels.err.message}`);
+      process.exit(1);
+    }
+
+    if (availableLabels.value.length > 0) {
+      const templateLabels = foundTemplate.value.contents.labels ?? [];
+      const labelsResult = await multiselectPrompts<string>({
+        message: "Select labels",
+        required: false,
+        options: availableLabels.value.map((label) => ({
+          title: label,
+          value: label,
+          selected: templateLabels.includes(label),
+        })),
+      });
+
+      if (labelsResult.isErr) {
+        log.error(`Error: ${labelsResult.err.message}`);
+        process.exit(1);
+      }
+
+      if (labelsResult.value.length > 0) {
+        issueContents.push({
+          title: "label",
+          contents: labelsResult.value.join(","),
+        });
+      }
+    }
+  }
+
+  const assignees =
+    repository.value.length > 0 ? getAssignableUsers(repository.value) : resultUtility.createOk([]);
 
   if (assignees.isErr) {
-    throw assignees.err;
+    log.error(`Error: ${assignees.err.message}`);
+    process.exit(1);
   }
 
   if (assignees.value.length > 0) {
