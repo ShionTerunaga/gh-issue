@@ -164,11 +164,13 @@ export async function numberPrompts({
  */
 export async function multilineTextPrompts({
   message,
+  initialValue,
   placeholder,
   cancelMessage = "Selection canceled.",
   errorMessage = "Failed to select an option",
 }: {
   message: string;
+  initialValue?: string;
   placeholder?: string;
   cancelMessage?: string;
   errorMessage?: string;
@@ -183,6 +185,7 @@ export async function multilineTextPrompts({
     fn: async () =>
       await multiline({
         message,
+        initialValue,
         placeholder,
         showSubmit: true,
       }),
