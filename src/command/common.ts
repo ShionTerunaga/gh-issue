@@ -5,7 +5,6 @@ import {
   multiline,
   multiselect,
   select,
-  settings,
   text,
 } from "@clack/prompts";
 import { resultUtility } from "ts-utility-kit";
