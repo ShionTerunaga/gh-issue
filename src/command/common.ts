@@ -84,8 +84,6 @@ export async function multilineTextPrompts({
 
   log.message(`${bold("To send, press the Tab key and then press Enter.")}\n`);
 
-  settings.actions.delete("space");
-
   const result = await checkPromiseReturn({
     fn: async () =>
       await multiline({
@@ -95,8 +93,6 @@ export async function multilineTextPrompts({
       }),
     err: (e) => createNg(createPromptError(errorMessage, e)),
   });
-
-  settings.actions.add("space");
 
   if (result.isErr) {
     return result;
@@ -161,7 +157,9 @@ export async function multiselectPrompts<T extends PromptValue>({
 }): Promise<Result<T[], Error>> {
   const { createNg, createOk, checkPromiseReturn } = resultUtility;
 
-  const initialValues = options.filter((option) => option.selected).map((option) => option.value);
+  const initialValues = options
+    .filter((option) => option.selected)
+    .map((option) => option.value);
 
   const result = await checkPromiseReturn({
     fn: async () =>
