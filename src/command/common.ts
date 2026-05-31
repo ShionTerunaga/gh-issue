@@ -1,12 +1,4 @@
-import {
-  cancel,
-  isCancel,
-  log,
-  multiline,
-  multiselect,
-  select,
-  text,
-} from "@clack/prompts";
+import { cancel, isCancel, log, multiline, multiselect, select, text } from "@clack/prompts";
 import { resultUtility } from "ts-utility-kit";
 import type { Result } from "ts-utility-kit";
 import { createPromptError } from "../shared/error";
@@ -156,9 +148,7 @@ export async function multiselectPrompts<T extends PromptValue>({
 }): Promise<Result<T[], Error>> {
   const { createNg, createOk, checkPromiseReturn } = resultUtility;
 
-  const initialValues = options
-    .filter((option) => option.selected)
-    .map((option) => option.value);
+  const initialValues = options.filter((option) => option.selected).map((option) => option.value);
 
   const result = await checkPromiseReturn({
     fn: async () =>
