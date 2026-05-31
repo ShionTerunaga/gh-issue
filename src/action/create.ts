@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { basename, extname, join } from "node:path";
-import { optionUtility, resultUtility } from "ts-utility-kit";
+import { optionUtility, resultUtility, type Result } from "ts-utility-kit";
 import { findTemplates } from "../helper/find-template";
 import { ymlParse } from "../helper/yml";
 import { selectTemplate } from "../command/create";
@@ -14,7 +14,10 @@ import {
 } from "../command/common";
 import { createContents } from "../helper/create-contents";
 import type { IssueContents } from "../helper/create-contents";
-import { writeIssueMarkdown, writeRawIssueMarkdown } from "../helper/write-issue-markdown";
+import {
+  writeIssueMarkdown,
+  writeRawIssueMarkdown,
+} from "../helper/write-issue-markdown";
 import { log } from "@clack/prompts";
 import { editTextareaWithVim } from "../helper/textarea-editor";
 import {
@@ -68,45 +71,54 @@ function hasValidDraftFrontMatter(markdown: string) {
   return /^title:\s*(.+)$/m.test(frontMatterMatch[1]);
 }
 
-async function createMarkdownDraft(templateContents: string, options: TextareaCreateOptions) {
+async function getInputMode() {
+  const { createNg, createOk } = resultUtility;
+  const inputModeResult = await selectPrompts<TextareaEditorMode>({
+    message: "Choose how to edit the markdown issue draft",
+    options: [
+      {
+        title: "Open in vim",
+        value: "vim",
+        hint: "Edit the template in a temporary hidden file",
+        selected: true,
+      },
+      {
+        title: "Enter with multiline",
+        value: "direct",
+        hint: "Edit the template in the current prompt",
+      },
+    ],
+    errorMessage: "Failed to select a markdown editor",
+  });
+
+  if (inputModeResult.isErr) {
+    return createNg(inputModeResult.err);
+  }
+
+  return createOk(inputModeResult.value);
+}
+
+async function createMarkdownDraft(
+  templateContents: string,
+  options: TextareaCreateOptions,
+) {
   const { createNg, createOk } = resultUtility;
   const presetEditorMode = resolveTextareaEditorMode(options);
-  let inputMode: TextareaEditorMode;
+  const inputMode: Result<TextareaEditorMode, Error> = presetEditorMode.isNone
+    ? await getInputMode()
+    : createOk(presetEditorMode.value);
 
-  if (presetEditorMode.isNone) {
-    const inputModeResult = await selectPrompts<TextareaEditorMode>({
-      message: "Choose how to edit the markdown issue draft",
-      options: [
-        {
-          title: "Open in vim",
-          value: "vim",
-          hint: "Edit the template in a temporary hidden file",
-          selected: true,
-        },
-        {
-          title: "Enter with multiline",
-          value: "direct",
-          hint: "Edit the template in the current prompt",
-        },
-      ],
-      errorMessage: "Failed to select a markdown editor",
-    });
-
-    if (inputModeResult.isErr) {
-      return createNg(inputModeResult.err);
-    }
-
-    inputMode = inputModeResult.value;
-  } else {
-    inputMode = presetEditorMode.value;
+  if (inputMode.isErr) {
+    return createNg(inputMode.err);
   }
 
   const draftResult =
-    inputMode === "vim"
+    inputMode.value === "vim"
       ? await editTextareaWithVim({
           initialValue: templateContents,
           title: "Issue markdown draft",
-          description: "Keep the front matter, especially the title field, at the top.",
+          description:
+            "Keep the front matter, especially the title field, at the top.",
         })
       : await multilineTextPrompts({
           message: "Edit the markdown issue draft",
@@ -123,7 +135,9 @@ async function createMarkdownDraft(templateContents: string, options: TextareaCr
   }
 
   if (!hasValidDraftFrontMatter(draftResult.value)) {
-    return createNg(new Error("Markdown draft must include front matter with a title field"));
+    return createNg(
+      new Error("Markdown draft must include front matter with a title field"),
+    );
   }
 
   return createOk(draftResult.value);
@@ -134,10 +148,14 @@ function getCurrentRepository() {
 
   const repo = checkResultReturn({
     fn: () =>
-      execFileSync("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"], {
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      }).trim(),
+      execFileSync(
+        "gh",
+        ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"],
+        {
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+        },
+      ).trim(),
     err: (e) => createNg(new Error(`error:${e}`)),
   });
 
@@ -157,10 +175,14 @@ function getAssignableUsers(repo: string) {
 
   const list = checkResultReturn({
     fn: () =>
-      execFileSync("gh", ["api", `repos/${repo}/assignees`, "--jq", ".[].login"], {
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      })
+      execFileSync(
+        "gh",
+        ["api", `repos/${repo}/assignees`, "--jq", ".[].login"],
+        {
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
+        },
+      )
         .trim()
         .split("\n")
         .filter(Boolean),
@@ -194,7 +216,9 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   const ghIssueDir = join(process.cwd(), ".gh-issue");
 
   if (!existsSync(ghIssueDir)) {
-    log.error(".gh-issue directory does not exist. Please run `gh-issue-kit init` first.");
+    log.error(
+      ".gh-issue directory does not exist. Please run `gh-issue-kit init` first.",
+    );
     process.exit(1);
   }
 
@@ -232,7 +256,10 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
         kind: "markdown",
         fileName,
         name: formatMarkdownTemplateName(fileName),
-        contents: readFileSync(join(process.cwd(), ".github", "ISSUE_TEMPLATE", fileName), "utf8"),
+        contents: readFileSync(
+          join(process.cwd(), ".github", "ISSUE_TEMPLATE", fileName),
+          "utf8",
+        ),
       })),
     err: (e) => createNg(e as Error),
   });
@@ -242,7 +269,10 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     process.exit(1);
   }
 
-  const templates: TemplateMaterial[] = [...yamlTemplates.value, ...markdownTemplates.value];
+  const templates: TemplateMaterial[] = [
+    ...yamlTemplates.value,
+    ...markdownTemplates.value,
+  ];
 
   const selectedMaterial: SelectMaterial[] = templates.map((tmp) => ({
     name: tmp.name,
@@ -266,14 +296,19 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   }
 
   if (foundTemplate.value.kind === "markdown") {
-    const markdownDraftResult = await createMarkdownDraft(foundTemplate.value.contents, options);
+    const markdownDraftResult = await createMarkdownDraft(
+      foundTemplate.value.contents,
+      options,
+    );
 
     if (markdownDraftResult.isErr) {
       log.error(`Error: ${markdownDraftResult.err.message}`);
       process.exit(1);
     }
 
-    const writeMarkdownResult = await writeRawIssueMarkdown(markdownDraftResult.value);
+    const writeMarkdownResult = await writeRawIssueMarkdown(
+      markdownDraftResult.value,
+    );
 
     if (writeMarkdownResult.isErr) {
       log.error(`Error: ${writeMarkdownResult.err.message}`);
@@ -304,7 +339,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
 
   issueContents.push({
     title: "title",
-    contents: title.value as string,
+    contents: title.value,
   });
 
   for (const tmp of foundTemplate.value.contents.body) {
@@ -362,7 +397,9 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   }
 
   const assignees =
-    repository.value.length > 0 ? getAssignableUsers(repository.value) : resultUtility.createOk([]);
+    repository.value.length > 0
+      ? getAssignableUsers(repository.value)
+      : resultUtility.createOk([]);
 
   if (assignees.isErr) {
     log.error(`Error: ${assignees.err.message}`);
