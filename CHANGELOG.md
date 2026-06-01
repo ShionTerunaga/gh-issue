@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.10.1
+
+### Patch Changes
+
+- [`2cf5ff3`](https://github.com/ShionTerunaga/gh-issue/commit/2cf5ff37236eedbfe6834b662eba62ce2e8b9518) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Upgrade according to npm
+
 ## 0.10.0
 
 ### Minor Changes
