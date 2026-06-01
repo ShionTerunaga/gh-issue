@@ -1,16 +1,15 @@
 import {
   cancel,
-  confirm,
   isCancel,
   log,
   multiline,
   multiselect,
   select,
-  settings,
   text,
+  confirm,
 } from "@clack/prompts";
-import { optionUtility, resultUtility } from "ts-utility-kit";
-import type { Option, Result } from "ts-utility-kit";
+import { resultUtility } from "ts-utility-kit";
+import { type Result, type Option, optionUtility } from "ts-utility-kit";
 import { createPromptError } from "../shared/error";
 import { bold } from "picocolors";
 
@@ -179,8 +178,6 @@ export async function multilineTextPrompts({
 
   log.message(`${bold("To send, press the Tab key and then press Enter.")}\n`);
 
-  settings.actions.delete("space");
-
   const result = await checkPromiseReturn({
     fn: async () =>
       await multiline({
@@ -191,8 +188,6 @@ export async function multilineTextPrompts({
       }),
     err: (e) => createNg(createPromptError(errorMessage, e)),
   });
-
-  settings.actions.add("space");
 
   if (result.isErr) {
     return result;
