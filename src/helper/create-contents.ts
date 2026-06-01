@@ -14,6 +14,7 @@ import { log } from "@clack/prompts";
 import { editTextareaWithVim } from "./textarea-editor";
 import {
   resolveTextareaEditorMode,
+  requiredTextareaEditorModeOptions,
   type TextareaCreateOptions,
   type TextareaEditorMode,
 } from "./textarea-options";
@@ -73,17 +74,7 @@ export async function createContents(
 
       if (presetEditorMode.isNone) {
         const inputModeOptions: PromptOption<"vim" | "direct" | "skip">[] = [
-          {
-            title: "Open in vim",
-            value: "vim",
-            hint: "Edit in a temporary hidden file",
-            selected: true,
-          },
-          {
-            title: "Enter directly",
-            value: "direct",
-            hint: "Use the current multiline prompt",
-          },
+          ...requiredTextareaEditorModeOptions,
         ];
 
         if (!required) {

@@ -11,6 +11,8 @@ import {
   selectPrompts,
   textPrompts,
 } from "../command/common";
+import { editTextareaWithVim } from "./textarea-editor";
+import type { TextareaEditorMode } from "./textarea-options";
 
 type BodyElementType = IssueFormElement["type"] | "end";
 
@@ -20,6 +22,25 @@ type BodyElementType = IssueFormElement["type"] | "end";
 function normalizeTemplateFileName(fileName: string) {
   const trimmed = fileName.trim().replace(/\.ya?ml$/i, "");
   return `${trimmed}.yml`;
+}
+
+/**
+ * Normalizes a template file name to a `.md` file path.
+ */
+function normalizeMarkdownTemplateFileName(fileName: string) {
+  const trimmed = fileName.trim().replace(/\.md$/i, "");
+  return `${trimmed}.md`;
+}
+
+function createMarkdownTemplateBodyInitialValue() {
+  return ["## Summary", "", ""].join("\n");
+}
+
+function createMarkdownTemplateContents(templateTitle: string, body: string) {
+  const normalizedBody = body.trim();
+  const serializedTitle = JSON.stringify(templateTitle);
+
+  return ["---", `title: ${serializedTitle}`, "---", "", normalizedBody, ""].join("\n");
 }
 
 /**
@@ -538,6 +559,66 @@ export async function createCustomIssueTemplate(cwd = process.cwd()) {
   await writeFile(targetPath, dump(contents, { lineWidth: -1, noRefs: true }), {
     flag: "wx",
   });
+
+  return resultUtility.createOk(targetPath);
+}
+
+/**
+ * Builds and writes a custom markdown issue template file.
+ */
+export async function createCustomMarkdownTemplate({
+  cwd = process.cwd(),
+  inputMode,
+}: {
+  cwd?: string;
+  inputMode: TextareaEditorMode;
+}) {
+  const fileName = await promptRequiredText("Template file name", "custom_issue");
+
+  if (fileName.isErr) {
+    return fileName;
+  }
+
+  const templateTitle = await promptRequiredText("Template title");
+
+  if (templateTitle.isErr) {
+    return templateTitle;
+  }
+
+  const markdownResult =
+    inputMode === "vim"
+      ? await editTextareaWithVim({
+          initialValue: createMarkdownTemplateBodyInitialValue(),
+          title: "Issue template body",
+          description: "Write the template body. The front matter is added automatically.",
+        })
+      : await multilineTextPrompts({
+          message: "Issue template body",
+          initialValue: createMarkdownTemplateBodyInitialValue(),
+          errorMessage: "Failed to enter markdown template body",
+        });
+
+  if (markdownResult.isErr) {
+    return markdownResult;
+  }
+
+  if (markdownResult.value.trim().length === 0) {
+    return resultUtility.createNg(new Error("Markdown template cannot be empty"));
+  }
+
+  const issueTemplateDir = join(cwd, ".github", "ISSUE_TEMPLATE");
+  const targetPath = join(issueTemplateDir, normalizeMarkdownTemplateFileName(fileName.value));
+
+  if (existsSync(targetPath)) {
+    return resultUtility.createNg(new Error(`Already exists ${targetPath}`));
+  }
+
+  await mkdir(issueTemplateDir, { recursive: true });
+  await writeFile(
+    targetPath,
+    createMarkdownTemplateContents(templateTitle.value, markdownResult.value),
+    { flag: "wx" },
+  );
 
   return resultUtility.createOk(targetPath);
 }

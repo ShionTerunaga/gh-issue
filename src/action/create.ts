@@ -18,6 +18,7 @@ import { writeIssueMarkdown, writeRawIssueMarkdown } from "../helper/write-issue
 import { log } from "@clack/prompts";
 import { editTextareaWithVim } from "../helper/textarea-editor";
 import {
+  requiredTextareaEditorModeOptions,
   resolveTextareaEditorMode,
   type TextareaCreateOptions,
   type TextareaEditorMode,
@@ -72,19 +73,7 @@ async function getInputMode() {
   const { createNg, createOk } = resultUtility;
   const inputModeResult = await selectPrompts<TextareaEditorMode>({
     message: "Choose how to edit the markdown issue draft",
-    options: [
-      {
-        title: "Open in vim",
-        value: "vim",
-        hint: "Edit the template in a temporary hidden file",
-        selected: true,
-      },
-      {
-        title: "Enter with multiline",
-        value: "direct",
-        hint: "Edit the template in the current prompt",
-      },
-    ],
+    options: requiredTextareaEditorModeOptions,
     errorMessage: "Failed to select a markdown editor",
   });
 
