@@ -1,5 +1,6 @@
 import {
   cancel,
+  confirm,
   isCancel,
   log,
   multiline,
@@ -8,8 +9,8 @@ import {
   settings,
   text,
 } from "@clack/prompts";
-import { resultUtility } from "ts-utility-kit";
-import type { Result } from "ts-utility-kit";
+import { optionUtility, resultUtility } from "ts-utility-kit";
+import type { Option, Result } from "ts-utility-kit";
 import { createPromptError } from "../shared/error";
 import { bold } from "picocolors";
 
@@ -22,6 +23,9 @@ export interface PromptOption<T> {
 
 type PromptValue = string | number | boolean;
 
+/**
+ * Converts a local prompt option into the shape expected by Clack.
+ */
 function toClackOption<T extends PromptValue>(option: PromptOption<T>) {
   return option.hint
     ? {
@@ -35,6 +39,9 @@ function toClackOption<T extends PromptValue>(option: PromptOption<T>) {
       };
 }
 
+/**
+ * Prompts for a single-line text value.
+ */
 export async function textPrompts({
   message,
   placeholder,
@@ -69,13 +76,101 @@ export async function textPrompts({
   return createOk(result.value as string);
 }
 
+/**
+ * Prompts for a whole number and returns it as an optional numeric value.
+ */
+export async function numberPrompts({
+  message,
+  placeholder,
+  required = true,
+  cancelMessage = "Selection canceled.",
+  errorMessage = "Failed to enter a number",
+  min,
+  max,
+}: {
+  message: string;
+  placeholder?: string;
+  required?: boolean;
+  cancelMessage?: string;
+  errorMessage?: string;
+  min?: number;
+  max?: number;
+}): Promise<Result<Option<number>, Error>> {
+  const { checkPromiseReturn, createNg, createOk } = resultUtility;
+  const { createNone, createSome } = optionUtility;
+
+  const result = await checkPromiseReturn({
+    fn: async () =>
+      await text({
+        message,
+        placeholder,
+        validate: (value) => {
+          if (value === undefined) {
+            return required ? "This field is required" : undefined;
+          }
+
+          const trimmed = value.trim();
+
+          if (trimmed.length === 0) {
+            return required ? "This field is required" : undefined;
+          }
+
+          const parsedValue = Number(trimmed);
+
+          if (!Number.isInteger(parsedValue)) {
+            return "Enter a whole number";
+          }
+
+          if (min !== undefined && parsedValue < min) {
+            return `Please enter a number greater than or equal to ${min}`;
+          }
+
+          if (max !== undefined && parsedValue > max) {
+            return `Please enter a number less than or equal to ${max}`;
+          }
+
+          return Number.isInteger(parsedValue) ? undefined : "Enter a whole number";
+        },
+      }),
+    err: (e) => createNg(createPromptError(errorMessage, e)),
+  });
+
+  if (result.isErr) {
+    return result;
+  }
+
+  if (isCancel(result.value)) {
+    cancel(cancelMessage);
+    process.exit(0);
+  }
+
+  const trimmed = (result.value as string).trim();
+
+  if (trimmed.length === 0) {
+    return createOk(createNone());
+  }
+
+  const parsedValue = Number.parseInt(trimmed, 10);
+
+  if (Number.isNaN(parsedValue)) {
+    return createNg(new Error("Failed to parse the input as a whole number"));
+  }
+
+  return createOk(createSome(parsedValue));
+}
+
+/**
+ * Prompts for multi-line text input.
+ */
 export async function multilineTextPrompts({
   message,
+  initialValue,
   placeholder,
   cancelMessage = "Selection canceled.",
   errorMessage = "Failed to select an option",
 }: {
   message: string;
+  initialValue?: string;
   placeholder?: string;
   cancelMessage?: string;
   errorMessage?: string;
@@ -90,6 +185,7 @@ export async function multilineTextPrompts({
     fn: async () =>
       await multiline({
         message,
+        initialValue,
         placeholder,
         showSubmit: true,
       }),
@@ -110,6 +206,9 @@ export async function multilineTextPrompts({
   return createOk(result.value as string);
 }
 
+/**
+ * Prompts the user to choose one option from a list.
+ */
 export async function selectPrompts<T extends PromptValue>({
   message,
   options,
@@ -146,6 +245,9 @@ export async function selectPrompts<T extends PromptValue>({
   return createOk(result.value as T);
 }
 
+/**
+ * Prompts the user to choose multiple options from a list.
+ */
 export async function multiselectPrompts<T extends PromptValue>({
   message,
   options,
@@ -184,4 +286,41 @@ export async function multiselectPrompts<T extends PromptValue>({
   }
 
   return createOk(result.value as T[]);
+}
+
+/**
+ * Prompts the user for a yes or no confirmation.
+ */
+export async function confirmPrompts({
+  message,
+  initialValue = true,
+  cancelMessage = "Selection canceled.",
+  errorMessage = "Failed to confirm",
+}: {
+  message: string;
+  initialValue?: boolean;
+  cancelMessage?: string;
+  errorMessage?: string;
+}): Promise<Result<boolean, Error>> {
+  const { createNg, createOk, checkPromiseReturn } = resultUtility;
+
+  const result = await checkPromiseReturn({
+    fn: async () =>
+      await confirm({
+        message,
+        initialValue,
+      }),
+    err: (e) => createNg(createPromptError(errorMessage, e)),
+  });
+
+  if (result.isErr) {
+    return result;
+  }
+
+  if (isCancel(result.value)) {
+    cancel(cancelMessage);
+    process.exit(0);
+  }
+
+  return createOk(result.value as boolean);
 }

@@ -74,18 +74,13 @@ function createRandomFileName() {
   return `${adjective}-${noun}-${suffix}.md`;
 }
 
-export async function writeIssueMarkdown(
-  issueContents: IssueContents[],
+async function writeUniqueMarkdownFile(
+  markdown: string,
   cwd = process.cwd(),
 ): Promise<Result<string, Error>> {
   const { checkPromiseReturn, createNg, createOk } = resultUtility;
   const { optionConversion } = optionUtility;
   const ghIssueDir = join(cwd, ".gh-issue");
-  const markdownResult = createIssueMarkdown(issueContents);
-
-  if (markdownResult.isErr) {
-    return markdownResult;
-  }
 
   const mkdirResult = await checkPromiseReturn({
     fn: async () => optionConversion(await mkdir(ghIssueDir, { recursive: true })),
@@ -101,8 +96,7 @@ export async function writeIssueMarkdown(
     const filePath = join(ghIssueDir, fileName);
 
     const writeResult = await checkPromiseReturn({
-      fn: async () =>
-        optionConversion(await writeFile(filePath, markdownResult.value, { flag: "wx" })),
+      fn: async () => optionConversion(await writeFile(filePath, markdown, { flag: "wx" })),
       err: (error) => createNg(error as Error),
     });
 
@@ -122,4 +116,24 @@ export async function writeIssueMarkdown(
   }
 
   return createNg(new Error("Failed to generate a unique markdown file name"));
+}
+
+export async function writeIssueMarkdown(
+  issueContents: IssueContents[],
+  cwd = process.cwd(),
+): Promise<Result<string, Error>> {
+  const markdownResult = createIssueMarkdown(issueContents);
+
+  if (markdownResult.isErr) {
+    return markdownResult;
+  }
+
+  return writeUniqueMarkdownFile(markdownResult.value, cwd);
+}
+
+export async function writeRawIssueMarkdown(
+  markdown: string,
+  cwd = process.cwd(),
+): Promise<Result<string, Error>> {
+  return writeUniqueMarkdownFile(markdown, cwd);
 }

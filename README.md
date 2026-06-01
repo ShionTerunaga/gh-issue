@@ -5,6 +5,7 @@ A command line tool for setting up GitHub Issue templates and drafting issues fr
 `gh-issue-kit` helps you:
 
 - initialize `.github/ISSUE_TEMPLATE`
+- add bundled or custom issue templates to `.github/ISSUE_TEMPLATE`
 - manage a local `.gh-issue/` workspace
 - create Markdown issue drafts from installed templates
 - send those drafts to GitHub Issues with `gh`
@@ -54,6 +55,7 @@ Example `package.json` scripts:
 {
   "scripts": {
     "gh-init": "gh-issue-kit init",
+    "gh-add-tmp": "gh-issue-kit add-tmp",
     "gh-create": "gh-issue-kit create",
     "gh-send": "gh-issue-kit send"
   }
@@ -95,6 +97,30 @@ The local draft workspace is:
 
 ```text
 .gh-issue/
+```
+
+### `gh-issue-kit add-tmp`
+
+Add an issue template to `.github/ISSUE_TEMPLATE/`.
+
+This command:
+
+- asks whether to use a bundled template or create a custom one
+- shows the available bundled templates: `bug_report (ja/en)` and `feature_request (ja/en)`
+- copies the bundled YAML template when you choose a bundled template
+- creates a custom YAML issue form when you choose the custom flow
+- asks for confirmation before ending custom body item entry
+
+Example:
+
+```sh
+gh-issue-kit add-tmp
+```
+
+Compatibility alias:
+
+```sh
+gh-issue-kit add-tmp
 ```
 
 ### `gh-issue-kit create`
