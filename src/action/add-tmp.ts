@@ -7,7 +7,11 @@ import { mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { copy } from "../helper/copy";
 import { multiselectPrompts, selectPrompts, type PromptOption } from "../command/common";
-import { createCustomIssueTemplate } from "../helper/custom-template";
+import { createCustomIssueTemplate, createCustomMarkdownTemplate } from "../helper/custom-template";
+import {
+  requiredTextareaEditorModeOptions,
+  type TextareaEditorMode,
+} from "../helper/textarea-options";
 
 interface IssueTemplateMaterial {
   lang: Language;
@@ -55,6 +59,40 @@ async function selectBundledTemplateVariants() {
   });
 }
 
+async function selectCustomTemplateFormat() {
+  return await selectPrompts<"yaml" | "md">({
+    message: "Choose the custom template format",
+    options: [
+      {
+        title: "YAML issue form",
+        value: "yaml",
+        selected: true,
+      },
+      {
+        title: "Markdown issue template",
+        value: "md",
+      },
+    ],
+    errorMessage: "Failed to select a custom template format",
+  });
+}
+
+async function createCustomMarkdownTemplateWithPrompt() {
+  const inputModeResult = await selectPrompts<TextareaEditorMode>({
+    message: "Choose how to enter the markdown template",
+    options: requiredTextareaEditorModeOptions,
+    errorMessage: "Failed to select a markdown editor",
+  });
+
+  if (inputModeResult.isErr) {
+    return inputModeResult;
+  }
+
+  return await createCustomMarkdownTemplate({
+    inputMode: inputModeResult.value,
+  });
+}
+
 /**
  * Adds bundled or custom issue templates into `.github/ISSUE_TEMPLATE`.
  */
@@ -84,7 +122,17 @@ export async function addTemplateAction() {
   }
 
   if (templateMode.value === "custom") {
-    const result = await createCustomIssueTemplate();
+    const formatResult = await selectCustomTemplateFormat();
+
+    if (formatResult.isErr) {
+      log.error(`Error: ${formatResult.err.message}`);
+      process.exit(1);
+    }
+
+    const result =
+      formatResult.value === "yaml"
+        ? await createCustomIssueTemplate()
+        : await createCustomMarkdownTemplateWithPrompt();
 
     if (result.isErr) {
       log.error(`Error: ${result.err.message}`);
