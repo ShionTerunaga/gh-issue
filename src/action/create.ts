@@ -180,9 +180,8 @@ async function getAvailableLabels(repo: string) {
     fn: async () =>
       (
         await execFileAsync("gh", ["api", `repos/${repo}/labels`, "--jq", ".[].name"], {
-        encoding: "utf8",
-          },
-        )
+          encoding: "utf8",
+        })
       ).stdout
         .trim()
         .split("\n")
