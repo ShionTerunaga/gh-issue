@@ -8,7 +8,10 @@ import { existsSync } from "node:fs";
 import { copy } from "../helper/copy";
 import { multiselectPrompts, selectPrompts, type PromptOption } from "../command/common";
 import { createCustomIssueTemplate, createCustomMarkdownTemplate } from "../helper/custom-template";
-import { requiredTextareaEditorModeOptions, type TextareaEditorMode } from "../helper/textarea-options";
+import {
+  requiredTextareaEditorModeOptions,
+  type TextareaEditorMode,
+} from "../helper/textarea-options";
 
 interface IssueTemplateMaterial {
   lang: Language;
