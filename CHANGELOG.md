@@ -1,5 +1,15 @@
 # gh-issue
 
+## 0.10.0
+
+### Minor Changes
+
+- [#69](https://github.com/ShionTerunaga/gh-issue/pull/69) [`0bb0c4d`](https://github.com/ShionTerunaga/gh-issue/commit/0bb0c4d20b0fe90dc538e60f6d0e5770de27aed7) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - We added a process to customize templates within CI and changed the command name.
+
+### Patch Changes
+
+- [#72](https://github.com/ShionTerunaga/gh-issue/pull/72) [`25d3ab2`](https://github.com/ShionTerunaga/gh-issue/commit/25d3ab2a771cf9f4be61d90814af140784891fa1) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - We have fixed the issue where uppercase letters could not be used in the input field.
+
 ## 0.9.1
 
 ### Patch Changes
