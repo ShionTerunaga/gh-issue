@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 
 import { parseDraftIssue } from "../src/helper/draft-issue";
+import { createUniqueFieldId, slugifyFieldId } from "../src/helper/custom-template";
 import { editTextareaWithVim } from "../src/helper/textarea-editor";
 import { createIssueMarkdown } from "../src/helper/write-issue-markdown";
 import { main } from "../src/index";
@@ -90,6 +91,15 @@ describe("createIssueTemplateYaml", () => {
   it("supports short template aliases", async () => {
     await expect(createIssueTemplateYaml("bug")).resolves.toContain("name: Bug Report");
     await expect(createIssueTemplateYaml("feature")).resolves.toContain("name: Feature Request");
+  });
+
+  it("ships bundled markdown templates alongside YAML templates", async () => {
+    await expect(
+      readFile(join(process.cwd(), "template", "en", "bug_report_en.md"), "utf8"),
+    ).resolves.toContain("## Summary");
+    await expect(
+      readFile(join(process.cwd(), "template", "ja", "feature_request_ja.md"), "utf8"),
+    ).resolves.toContain("## 背景とユーザーストーリー");
   });
 });
 
@@ -243,5 +253,20 @@ describe("parseDraftIssue", () => {
     expect(issue.labels).toEqual(["bug", "triage"]);
     expect(issue.assignees).toEqual(["octocat", "hubot"]);
     expect(issue.body).toBe("## Details\n\nBody");
+  });
+});
+
+describe("custom template field ids", () => {
+  it("slugifies labels into field ids", () => {
+    expect(slugifyFieldId("Background and user story")).toBe("background-and-user-story");
+    expect(slugifyFieldId("  !!!  ")).toBe("field");
+  });
+
+  it("adds a numeric suffix when ids would collide", () => {
+    const usedIds = new Set<string>();
+
+    expect(createUniqueFieldId("Summary", usedIds)).toBe("summary");
+    expect(createUniqueFieldId("summary", usedIds)).toBe("summary-2");
+    expect(createUniqueFieldId("Summary!", usedIds)).toBe("summary-3");
   });
 });

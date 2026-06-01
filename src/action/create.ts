@@ -1,21 +1,137 @@
 import { execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
-import { join } from "node:path";
-import { optionUtility, resultUtility } from "ts-utility-kit";
+import { existsSync, readFileSync } from "node:fs";
+import { basename, extname, join } from "node:path";
+import { optionUtility, resultUtility, type Result } from "ts-utility-kit";
 import { findTemplates } from "../helper/find-template";
 import { ymlParse } from "../helper/yml";
 import { selectTemplate } from "../command/create";
 import { bold, green } from "picocolors";
-import { multiselectPrompts, textPrompts } from "../command/common";
+import {
+  multilineTextPrompts,
+  multiselectPrompts,
+  selectPrompts,
+  textPrompts,
+} from "../command/common";
 import { createContents } from "../helper/create-contents";
 import type { IssueContents } from "../helper/create-contents";
-import { writeIssueMarkdown } from "../helper/write-issue-markdown";
+import { writeIssueMarkdown, writeRawIssueMarkdown } from "../helper/write-issue-markdown";
 import { log } from "@clack/prompts";
-import type { TextareaCreateOptions } from "../helper/textarea-options";
+import { editTextareaWithVim } from "../helper/textarea-editor";
+import {
+  resolveTextareaEditorMode,
+  type TextareaCreateOptions,
+  type TextareaEditorMode,
+} from "../helper/textarea-options";
 
 export interface SelectMaterial {
   name: string;
   fileName: string;
+}
+
+interface YamlTemplateMaterial {
+  kind: "yaml";
+  fileName: string;
+  name: string;
+  contents: ReturnType<typeof ymlParse>[number]["contents"];
+}
+
+interface MarkdownTemplateMaterial {
+  kind: "markdown";
+  fileName: string;
+  name: string;
+  contents: string;
+}
+
+type TemplateMaterial = YamlTemplateMaterial | MarkdownTemplateMaterial;
+
+function isYamlTemplate(fileName: string) {
+  const extension = extname(fileName).toLowerCase();
+
+  return extension === ".yml" || extension === ".yaml";
+}
+
+function isMarkdownTemplate(fileName: string) {
+  return extname(fileName).toLowerCase() === ".md";
+}
+
+function formatMarkdownTemplateName(fileName: string) {
+  return `${basename(fileName, extname(fileName)).replaceAll(/[_-]+/g, " ")} [markdown]`;
+}
+
+function hasValidDraftFrontMatter(markdown: string) {
+  const frontMatterMatch = markdown.match(/^---\n([\s\S]*?)\n---\n?[\s\S]*$/);
+
+  if (!frontMatterMatch) {
+    return false;
+  }
+
+  return /^title:\s*(.+)$/m.test(frontMatterMatch[1]);
+}
+
+async function getInputMode() {
+  const { createNg, createOk } = resultUtility;
+  const inputModeResult = await selectPrompts<TextareaEditorMode>({
+    message: "Choose how to edit the markdown issue draft",
+    options: [
+      {
+        title: "Open in vim",
+        value: "vim",
+        hint: "Edit the template in a temporary hidden file",
+        selected: true,
+      },
+      {
+        title: "Enter with multiline",
+        value: "direct",
+        hint: "Edit the template in the current prompt",
+      },
+    ],
+    errorMessage: "Failed to select a markdown editor",
+  });
+
+  if (inputModeResult.isErr) {
+    return createNg(inputModeResult.err);
+  }
+
+  return createOk(inputModeResult.value);
+}
+
+async function createMarkdownDraft(templateContents: string, options: TextareaCreateOptions) {
+  const { createNg, createOk } = resultUtility;
+  const presetEditorMode = resolveTextareaEditorMode(options);
+  const inputMode: Result<TextareaEditorMode, Error> = presetEditorMode.isNone
+    ? await getInputMode()
+    : createOk(presetEditorMode.value);
+
+  if (inputMode.isErr) {
+    return createNg(inputMode.err);
+  }
+
+  const draftResult =
+    inputMode.value === "vim"
+      ? await editTextareaWithVim({
+          initialValue: templateContents,
+          title: "Issue markdown draft",
+          description: "Keep the front matter, especially the title field, at the top.",
+        })
+      : await multilineTextPrompts({
+          message: "Edit the markdown issue draft",
+          initialValue: templateContents,
+          errorMessage: "Failed to edit the markdown issue draft",
+        });
+
+  if (draftResult.isErr) {
+    return createNg(draftResult.err);
+  }
+
+  if (draftResult.value.trim().length === 0) {
+    return createNg(new Error("Markdown draft cannot be empty"));
+  }
+
+  if (!hasValidDraftFrontMatter(draftResult.value)) {
+    return createNg(new Error("Markdown draft must include front matter with a title field"));
+  }
+
+  return createOk(draftResult.value);
 }
 
 function getCurrentRepository() {
@@ -96,17 +212,44 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     process.exit(1);
   }
 
-  const templateContents = checkResultReturn({
-    fn: () => ymlParse(findTemplateResult.value),
+  const yamlFiles = findTemplateResult.value.filter(isYamlTemplate);
+  const markdownFiles = findTemplateResult.value.filter(isMarkdownTemplate);
+
+  const yamlTemplates = checkResultReturn({
+    fn: () =>
+      ymlParse(yamlFiles).map<YamlTemplateMaterial>((tmp) => ({
+        kind: "yaml",
+        fileName: tmp.fileName,
+        name: `${tmp.name} [form]`,
+        contents: tmp.contents,
+      })),
     err: (e) => createNg(e as Error),
   });
 
-  if (templateContents.isErr) {
-    log.error(`Error: ${templateContents.err.message}`);
+  if (yamlTemplates.isErr) {
+    log.error(`Error: ${yamlTemplates.err.message}`);
     process.exit(1);
   }
 
-  const selectedMaterial: SelectMaterial[] = templateContents.value.map((tmp) => ({
+  const markdownTemplates = checkResultReturn({
+    fn: () =>
+      markdownFiles.map<MarkdownTemplateMaterial>((fileName) => ({
+        kind: "markdown",
+        fileName,
+        name: formatMarkdownTemplateName(fileName),
+        contents: readFileSync(join(process.cwd(), ".github", "ISSUE_TEMPLATE", fileName), "utf8"),
+      })),
+    err: (e) => createNg(e as Error),
+  });
+
+  if (markdownTemplates.isErr) {
+    log.error(`Error: ${markdownTemplates.err.message}`);
+    process.exit(1);
+  }
+
+  const templates: TemplateMaterial[] = [...yamlTemplates.value, ...markdownTemplates.value];
+
+  const selectedMaterial: SelectMaterial[] = templates.map((tmp) => ({
     name: tmp.name,
     fileName: tmp.fileName,
   }));
@@ -119,12 +262,31 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   }
 
   const foundTemplate = optionConversion(
-    templateContents.value.find((tmp) => tmp.fileName === selectedTemplate.value),
+    templates.find((tmp) => tmp.fileName === selectedTemplate.value),
   );
 
   if (foundTemplate.isNone) {
     log.error("Error: Selected template not found");
     process.exit(1);
+  }
+
+  if (foundTemplate.value.kind === "markdown") {
+    const markdownDraftResult = await createMarkdownDraft(foundTemplate.value.contents, options);
+
+    if (markdownDraftResult.isErr) {
+      log.error(`Error: ${markdownDraftResult.err.message}`);
+      process.exit(1);
+    }
+
+    const writeMarkdownResult = await writeRawIssueMarkdown(markdownDraftResult.value);
+
+    if (writeMarkdownResult.isErr) {
+      log.error(`Error: ${writeMarkdownResult.err.message}`);
+      process.exit(1);
+    }
+
+    log.success(`Saved issue draft: ${writeMarkdownResult.value}`);
+    return;
   }
 
   log.message(`${bold(green(foundTemplate.value.name))}\n`);
@@ -147,7 +309,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
 
   issueContents.push({
     title: "title",
-    contents: title.value as string,
+    contents: title.value,
   });
 
   for (const tmp of foundTemplate.value.contents.body) {
