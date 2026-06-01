@@ -1,6 +1,7 @@
-import { execFileSync } from "node:child_process";
+import { execFile } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { basename, extname, join } from "node:path";
+import { promisify } from "node:util";
 import { optionUtility, resultUtility, type Result } from "ts-utility-kit";
 import { findTemplates } from "../helper/find-template";
 import { ymlParse } from "../helper/yml";
@@ -15,7 +16,7 @@ import {
 import { createContents } from "../helper/create-contents";
 import type { IssueContents } from "../helper/create-contents";
 import { writeIssueMarkdown, writeRawIssueMarkdown } from "../helper/write-issue-markdown";
-import { log } from "@clack/prompts";
+import { log, spinner } from "@clack/prompts";
 import { editTextareaWithVim } from "../helper/textarea-editor";
 import {
   requiredTextareaEditorModeOptions,
@@ -23,6 +24,8 @@ import {
   type TextareaCreateOptions,
   type TextareaEditorMode,
 } from "../helper/textarea-options";
+
+const execFileAsync = promisify(execFile);
 
 export interface SelectMaterial {
   name: string;
@@ -123,15 +126,20 @@ async function createMarkdownDraft(templateContents: string, options: TextareaCr
   return createOk(draftResult.value);
 }
 
-function getCurrentRepository() {
-  const { checkResultReturn, createNg, createOk } = resultUtility;
+async function getCurrentRepository() {
+  const { checkPromiseReturn, createNg, createOk } = resultUtility;
 
-  const repo = checkResultReturn({
-    fn: () =>
-      execFileSync("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"], {
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      }).trim(),
+  const repo = await checkPromiseReturn({
+    fn: async () =>
+      (
+        await execFileAsync(
+          "gh",
+          ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"],
+          {
+            encoding: "utf8",
+          },
+        )
+      ).stdout.trim(),
     err: (e) => createNg(new Error(`error:${e}`)),
   });
 
@@ -146,15 +154,16 @@ function getCurrentRepository() {
   return createOk(repo.value);
 }
 
-function getAssignableUsers(repo: string) {
-  const { checkResultReturn, createNg } = resultUtility;
+async function getAssignableUsers(repo: string) {
+  const { checkPromiseReturn, createNg } = resultUtility;
 
-  const list = checkResultReturn({
-    fn: () =>
-      execFileSync("gh", ["api", `repos/${repo}/assignees`, "--jq", ".[].login"], {
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      })
+  const list = await checkPromiseReturn({
+    fn: async () =>
+      (
+        await execFileAsync("gh", ["api", `repos/${repo}/assignees`, "--jq", ".[].login"], {
+          encoding: "utf8",
+        })
+      ).stdout
         .trim()
         .split("\n")
         .filter(Boolean),
@@ -164,15 +173,17 @@ function getAssignableUsers(repo: string) {
   return list;
 }
 
-function getAvailableLabels(repo: string) {
-  const { checkResultReturn, createNg } = resultUtility;
+async function getAvailableLabels(repo: string) {
+  const { checkPromiseReturn, createNg } = resultUtility;
 
-  const list = checkResultReturn({
-    fn: () =>
-      execFileSync("gh", ["api", `repos/${repo}/labels`, "--jq", ".[].name"], {
+  const list = await checkPromiseReturn({
+    fn: async () =>
+      (
+        await execFileAsync("gh", ["api", `repos/${repo}/labels`, "--jq", ".[].name"], {
         encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      })
+          },
+        )
+      ).stdout
         .trim()
         .split("\n")
         .filter(Boolean),
@@ -314,7 +325,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     }
   }
 
-  const repository = getCurrentRepository();
+  const repository = await getCurrentRepository();
 
   if (repository.isErr) {
     log.error(`Error: ${repository.err.message}`);
@@ -322,12 +333,17 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   }
 
   if (repository.value.length > 0) {
-    const availableLabels = getAvailableLabels(repository.value);
+    const metadataSpinner = spinner();
+    metadataSpinner.start("Fetching repository labels...");
+    const availableLabels = await getAvailableLabels(repository.value);
 
     if (availableLabels.isErr) {
+      metadataSpinner.stop("Fetching repository labels failed.");
       log.error(`Error: ${availableLabels.err.message}`);
       process.exit(1);
     }
+
+    metadataSpinner.stop("Fetched repository labels.");
 
     if (availableLabels.value.length > 0) {
       const templateLabels = foundTemplate.value.contents.labels ?? [];
@@ -356,7 +372,21 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   }
 
   const assignees =
-    repository.value.length > 0 ? getAssignableUsers(repository.value) : resultUtility.createOk([]);
+    repository.value.length > 0
+      ? await (async () => {
+          const metadataSpinner = spinner();
+          metadataSpinner.start("Fetching assignable users...");
+          const result = await getAssignableUsers(repository.value);
+
+          if (result.isErr) {
+            metadataSpinner.stop("Fetching assignable users failed.");
+            return result;
+          }
+
+          metadataSpinner.stop("Fetched assignable users.");
+          return result;
+        })()
+      : resultUtility.createOk([]);
 
   if (assignees.isErr) {
     log.error(`Error: ${assignees.err.message}`);

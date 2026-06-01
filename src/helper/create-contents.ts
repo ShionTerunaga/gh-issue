@@ -1,7 +1,7 @@
 import { optionUtility, resultUtility } from "ts-utility-kit";
 import type { Option, Result } from "ts-utility-kit";
 import type { IssueFormElement } from "./issue-tyepe";
-import { blue, bold, red } from "picocolors";
+import { bold, cyan, red } from "picocolors";
 import {
   multilineTextPrompts,
   multiselectPrompts,
@@ -32,15 +32,15 @@ export async function createContents(
   const { createNone, createSome } = optionUtility;
   switch (tmpBody.type) {
     case "markdown": {
-      log.message(blue(tmpBody.attributes.value));
+      log.message(cyan(tmpBody.attributes.value));
 
       return createOk(createNone());
     }
     case "input": {
       log.message(
-        `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
+        `${bold(cyan(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
+      log.message(cyan(tmpBody.attributes.description || "No description") + "\n");
 
       const inputResult = await textPrompts({
         message: tmpBody.attributes.label,
@@ -65,9 +65,9 @@ export async function createContents(
 
     case "textarea": {
       log.message(
-        `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
+        `${bold(cyan(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
+      log.message(cyan(tmpBody.attributes.description || "No description") + "\n");
       const required = tmpBody.validations?.required === true;
       const presetEditorMode = resolveTextareaEditorMode(options);
       let inputMode: TextareaEditorMode | "skip";
@@ -152,9 +152,9 @@ export async function createContents(
     }
     case "checkboxes": {
       log.message(
-        `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
+        `${bold(cyan(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
+      log.message(cyan(tmpBody.attributes.description || "No description") + "\n");
 
       const checkList: PromptOption<string>[] = tmpBody.attributes.options.map((option) => ({
         title: option.label,
@@ -194,9 +194,9 @@ export async function createContents(
 
     case "dropdown": {
       log.message(
-        `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
+        `${bold(cyan(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
+      log.message(cyan(tmpBody.attributes.description || "No description") + "\n");
 
       const dropdownOptions: PromptOption<string>[] = tmpBody.attributes.options.map(
         (option, index) => ({
@@ -228,11 +228,11 @@ export async function createContents(
     }
     case "upload": {
       log.message(
-        `${bold(blue(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
+        `${bold(cyan(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(blue(tmpBody.attributes.description || "No description") + "\n");
+      log.message(cyan(tmpBody.attributes.description || "No description") + "\n");
 
-      log.message(blue("File upload is not supported in this version") + "\n");
+      log.message(cyan("File upload is not supported in this version") + "\n");
 
       return createOk(createNone());
     }
