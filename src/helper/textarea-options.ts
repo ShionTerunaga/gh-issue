@@ -6,7 +6,7 @@ export type TextareaEditorMode = "vim" | "direct";
 
 export interface TextareaCreateOptions {
   vim?: boolean;
-  noVim?: boolean;
+  direct?: boolean;
 }
 
 export const requiredTextareaEditorModeOptions: PromptOption<TextareaEditorMode>[] = [
@@ -32,7 +32,7 @@ export function resolveTextareaEditorMode(
     return createSome("vim");
   }
 
-  if (options?.vim === false || options?.noVim === true) {
+  if (options?.vim === false || options?.direct === true) {
     return createSome("direct");
   }
 

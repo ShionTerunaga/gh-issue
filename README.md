@@ -157,7 +157,7 @@ Example:
 gh-issue-kit create --vim
 ```
 
-##### `--no-vim`
+##### `--direct`
 
 Preselect direct input for textarea fields.
 
@@ -169,7 +169,7 @@ Behavior:
 Example:
 
 ```sh
-gh-issue-kit create --no-vim
+gh-issue-kit create --direct
 ```
 
 #### Textarea behavior
