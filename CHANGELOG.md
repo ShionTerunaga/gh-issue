@@ -1,5 +1,15 @@
 # gh-issue
 
+## 0.11.0
+
+### Minor Changes
+
+- [#79](https://github.com/ShionTerunaga/gh-issue/pull/79) [`4a9f467`](https://github.com/ShionTerunaga/gh-issue/commit/4a9f467c72a7dcc382ba30e22a7244202ee50b6f) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Change `—no-vim` to `—direct`
+
+### Patch Changes
+
+- [#77](https://github.com/ShionTerunaga/gh-issue/pull/77) [`9b9934d`](https://github.com/ShionTerunaga/gh-issue/commit/9b9934d0e9e749add69f689644388ff03a46e51e) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Changed the text color and fixed the spinner so it works
+
 ## 0.10.1
 
 ### Patch Changes
