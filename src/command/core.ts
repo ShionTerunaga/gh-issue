@@ -24,7 +24,7 @@ export function createCommander() {
     .command("create")
     .description("Create an issue template")
     .option("--vim", "Use Vim editor for textarea")
-    .option("--no-vim", "Use default editor for textarea")
+    .option("--direct", "Use direct multiline input for textarea")
     .action((options) => createIssueAction(options));
 
   program
