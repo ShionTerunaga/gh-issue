@@ -1,8 +1,8 @@
 import fastGlob from "fast-glob";
 import { copyFile, mkdir } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
-import { resultUtility } from "ts-utility-kit";
-import type { Result } from "ts-utility-kit";
+import { checkPromiseReturn, createErr, createOk, isErr } from "ts-utility-kit/result";
+import type { Result } from "ts-utility-kit/result";
 
 interface CopyOptions {
   cwd?: string;
@@ -18,12 +18,10 @@ export async function copy(
   dest: string,
   { cwd, rename = identity, parents = true }: CopyOptions,
 ): Promise<Result<() => void, Error>> {
-  const { createNg, createOk, checkPromiseReturn } = resultUtility;
-
   const sources = typeof src === "string" ? [src] : src;
 
   if (sources.length === 0 || dest === "") {
-    return createNg(new Error("src or dest is empty"));
+    return createErr(new Error("src or dest is empty"));
   }
 
   const sourceFiles = await checkPromiseReturn({
@@ -35,10 +33,10 @@ export async function copy(
         stats: false,
         onlyFiles: true,
       }),
-    err: () => createNg(new Error("Failed to glob source files")),
+    err: () => createErr(new Error("Failed to glob source files")),
   });
 
-  if (sourceFiles.isErr) {
+  if (isErr(sourceFiles)) {
     return sourceFiles;
   }
 

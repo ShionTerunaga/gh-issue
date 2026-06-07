@@ -1,5 +1,7 @@
-import { optionUtility, resultUtility } from "ts-utility-kit";
-import type { Option, Result } from "ts-utility-kit";
+import { createNone, createSome, isNone } from "ts-utility-kit/option";
+import type { Option } from "ts-utility-kit/option";
+import { createErr, createOk, isErr } from "ts-utility-kit/result";
+import type { Result } from "ts-utility-kit/result";
 import type { IssueFormElement } from "./issue-tyepe";
 import { bold, cyan, red } from "picocolors";
 import {
@@ -28,8 +30,6 @@ export async function createContents(
   tmpBody: IssueFormElement,
   options?: TextareaCreateOptions,
 ): Promise<Result<Option<IssueContents>, Error>> {
-  const { createOk, createNg } = resultUtility;
-  const { createNone, createSome } = optionUtility;
   switch (tmpBody.type) {
     case "markdown": {
       log.message(cyan(tmpBody.attributes.value));
@@ -40,19 +40,24 @@ export async function createContents(
       log.message(
         `${bold(cyan(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(cyan(tmpBody.attributes.description || "No description") + "\n");
+      log.message(
+        cyan(tmpBody.attributes.description || "No description") + "\n",
+      );
 
       const inputResult = await textPrompts({
         message: tmpBody.attributes.label,
         placeholder: tmpBody.attributes.placeholder,
       });
 
-      if (inputResult.isErr) {
-        return createNg(inputResult.err);
+      if (isErr(inputResult)) {
+        return createErr(inputResult.err);
       }
 
-      if (tmpBody.validations?.required && (inputResult.value as string).trim().length === 0) {
-        return createNg(new Error("This field is required"));
+      if (
+        tmpBody.validations?.required &&
+        (inputResult.value as string).trim().length === 0
+      ) {
+        return createErr(new Error("This field is required"));
       }
 
       return createOk(
@@ -67,12 +72,14 @@ export async function createContents(
       log.message(
         `${bold(cyan(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(cyan(tmpBody.attributes.description || "No description") + "\n");
+      log.message(
+        cyan(tmpBody.attributes.description || "No description") + "\n",
+      );
       const required = tmpBody.validations?.required === true;
       const presetEditorMode = resolveTextareaEditorMode(options);
       let inputMode: TextareaEditorMode | "skip";
 
-      if (presetEditorMode.isNone) {
+      if (isNone(presetEditorMode)) {
         const inputModeOptions: PromptOption<"vim" | "direct" | "skip">[] = [
           ...requiredTextareaEditorModeOptions,
         ];
@@ -90,8 +97,8 @@ export async function createContents(
           options: inputModeOptions,
         });
 
-        if (inputModeResult.isErr) {
-          return createNg(inputModeResult.err);
+        if (isErr(inputModeResult)) {
+          return createErr(inputModeResult.err);
         }
 
         inputMode = inputModeResult.value;
@@ -102,7 +109,10 @@ export async function createContents(
           message: `${tmpBody.attributes.label}\nChoose whether to edit this textarea content`,
           options: [
             {
-              title: presetEditorMode.value === "vim" ? "Edit in vim" : "Enter directly",
+              title:
+                presetEditorMode.value === "vim"
+                  ? "Edit in vim"
+                  : "Enter directly",
               value: "edit",
               selected: true,
             },
@@ -114,16 +124,17 @@ export async function createContents(
           ],
         });
 
-        if (shouldEditResult.isErr) {
-          return createNg(shouldEditResult.err);
+        if (isErr(shouldEditResult)) {
+          return createErr(shouldEditResult.err);
         }
 
-        inputMode = shouldEditResult.value === "skip" ? "skip" : presetEditorMode.value;
+        inputMode =
+          shouldEditResult.value === "skip" ? "skip" : presetEditorMode.value;
       }
 
       const textareaResult =
         inputMode === "skip"
-          ? resultUtility.createOk("")
+          ? createOk("")
           : inputMode === "vim"
             ? await editTextareaWithVim({
                 initialValue: tmpBody.attributes.value,
@@ -135,12 +146,12 @@ export async function createContents(
                 placeholder: tmpBody.attributes.placeholder,
               });
 
-      if (textareaResult.isErr) {
-        return createNg(textareaResult.err);
+      if (isErr(textareaResult)) {
+        return createErr(textareaResult.err);
       }
 
       if (required && (textareaResult.value as string).trim().length === 0) {
-        return createNg(new Error("This field is required"));
+        return createErr(new Error("This field is required"));
       }
 
       return createOk(
@@ -154,30 +165,39 @@ export async function createContents(
       log.message(
         `${bold(cyan(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(cyan(tmpBody.attributes.description || "No description") + "\n");
+      log.message(
+        cyan(tmpBody.attributes.description || "No description") + "\n",
+      );
 
-      const checkList: PromptOption<string>[] = tmpBody.attributes.options.map((option) => ({
-        title: option.label,
-        value: option.label,
-        selected: option.required || false,
-      }));
+      const checkList: PromptOption<string>[] = tmpBody.attributes.options.map(
+        (option) => ({
+          title: option.label,
+          value: option.label,
+          selected: option.required || false,
+        }),
+      );
 
       const checkboxesResult = await multiselectPrompts({
         message: tmpBody.attributes.label,
         options: checkList,
       });
 
-      if (checkboxesResult.isErr) {
-        return createNg(checkboxesResult.err);
+      if (isErr(checkboxesResult)) {
+        return createErr(checkboxesResult.err);
       }
 
-      if (tmpBody.validations?.required && checkboxesResult.value.length === 0) {
-        return createNg(new Error("At least one option must be selected"));
+      if (
+        tmpBody.validations?.required &&
+        checkboxesResult.value.length === 0
+      ) {
+        return createErr(new Error("At least one option must be selected"));
       }
 
       for (const option of tmpBody.attributes.options) {
         if (option.required && !checkboxesResult.value.includes(option.label)) {
-          return createNg(new Error(`The option "${option.label}" is required`));
+          return createErr(
+            new Error(`The option "${option.label}" is required`),
+          );
         }
       }
 
@@ -196,27 +216,28 @@ export async function createContents(
       log.message(
         `${bold(cyan(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(cyan(tmpBody.attributes.description || "No description") + "\n");
+      log.message(
+        cyan(tmpBody.attributes.description || "No description") + "\n",
+      );
 
-      const dropdownOptions: PromptOption<string>[] = tmpBody.attributes.options.map(
-        (option, index) => ({
+      const dropdownOptions: PromptOption<string>[] =
+        tmpBody.attributes.options.map((option, index) => ({
           title: option,
           value: option,
           selected: tmpBody.attributes.default === index,
-        }),
-      );
+        }));
 
       const dropdownResult = await selectPrompts({
         message: tmpBody.attributes.label,
         options: dropdownOptions,
       });
 
-      if (dropdownResult.isErr) {
-        return createNg(dropdownResult.err);
+      if (isErr(dropdownResult)) {
+        return createErr(dropdownResult.err);
       }
 
       if (tmpBody.validations?.required && dropdownResult.value === "") {
-        return createNg(new Error("This field is required"));
+        return createErr(new Error("This field is required"));
       }
 
       return createOk(
@@ -230,7 +251,9 @@ export async function createContents(
       log.message(
         `${bold(cyan(tmpBody.attributes.label))} ${tmpBody.validations?.required ? red("*") : ""}\n\n`,
       );
-      log.message(cyan(tmpBody.attributes.description || "No description") + "\n");
+      log.message(
+        cyan(tmpBody.attributes.description || "No description") + "\n",
+      );
 
       log.message(cyan("File upload is not supported in this version") + "\n");
 
@@ -238,6 +261,8 @@ export async function createContents(
     }
 
     default:
-      return createNg(new Error(`Unsupported content type: ${(tmpBody as any).type}`));
+      return createErr(
+        new Error(`Unsupported content type: ${(tmpBody as any).type}`),
+      );
   }
 }

@@ -1,4 +1,4 @@
-import type { Result } from "ts-utility-kit";
+import type { Result } from "ts-utility-kit/result";
 import type { SelectMaterial } from "../action/create";
 import { selectPrompts } from "./common";
 

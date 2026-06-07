@@ -2,7 +2,15 @@ import { execFile } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { basename, extname, join } from "node:path";
 import { promisify } from "node:util";
-import { optionUtility, resultUtility, type Result } from "ts-utility-kit";
+import { isNone, isSome, optionConversion } from "ts-utility-kit/option";
+import {
+  checkPromiseReturn,
+  checkResultReturn,
+  createErr,
+  createOk,
+  isErr,
+} from "ts-utility-kit/result";
+import type { Result } from "ts-utility-kit/result";
 import { findTemplates } from "../helper/find-template";
 import { ymlParse } from "../helper/yml";
 import { selectTemplate } from "../command/create";
@@ -73,29 +81,27 @@ function hasValidDraftFrontMatter(markdown: string) {
 }
 
 async function getInputMode() {
-  const { createNg, createOk } = resultUtility;
   const inputModeResult = await selectPrompts<TextareaEditorMode>({
     message: "Choose how to edit the markdown issue draft",
     options: requiredTextareaEditorModeOptions,
     errorMessage: "Failed to select a markdown editor",
   });
 
-  if (inputModeResult.isErr) {
-    return createNg(inputModeResult.err);
+  if (isErr(inputModeResult)) {
+    return createErr(inputModeResult.err);
   }
 
   return createOk(inputModeResult.value);
 }
 
 async function createMarkdownDraft(templateContents: string, options: TextareaCreateOptions) {
-  const { createNg, createOk } = resultUtility;
   const presetEditorMode = resolveTextareaEditorMode(options);
-  const inputMode: Result<TextareaEditorMode, Error> = presetEditorMode.isNone
+  const inputMode: Result<TextareaEditorMode, Error> = isNone(presetEditorMode)
     ? await getInputMode()
     : createOk(presetEditorMode.value);
 
-  if (inputMode.isErr) {
-    return createNg(inputMode.err);
+  if (isErr(inputMode)) {
+    return createErr(inputMode.err);
   }
 
   const draftResult =
@@ -111,24 +117,22 @@ async function createMarkdownDraft(templateContents: string, options: TextareaCr
           errorMessage: "Failed to edit the markdown issue draft",
         });
 
-  if (draftResult.isErr) {
-    return createNg(draftResult.err);
+  if (isErr(draftResult)) {
+    return createErr(draftResult.err);
   }
 
   if (draftResult.value.trim().length === 0) {
-    return createNg(new Error("Markdown draft cannot be empty"));
+    return createErr(new Error("Markdown draft cannot be empty"));
   }
 
   if (!hasValidDraftFrontMatter(draftResult.value)) {
-    return createNg(new Error("Markdown draft must include front matter with a title field"));
+    return createErr(new Error("Markdown draft must include front matter with a title field"));
   }
 
   return createOk(draftResult.value);
 }
 
 async function getCurrentRepository() {
-  const { checkPromiseReturn, createNg, createOk } = resultUtility;
-
   const repo = await checkPromiseReturn({
     fn: async () =>
       (
@@ -140,10 +144,10 @@ async function getCurrentRepository() {
           },
         )
       ).stdout.trim(),
-    err: (e) => createNg(new Error(`error:${e}`)),
+    err: (e) => createErr(new Error(`error:${e}`)),
   });
 
-  if (repo.isErr) {
+  if (isErr(repo)) {
     return repo;
   }
 
@@ -155,8 +159,6 @@ async function getCurrentRepository() {
 }
 
 async function getAssignableUsers(repo: string) {
-  const { checkPromiseReturn, createNg } = resultUtility;
-
   const list = await checkPromiseReturn({
     fn: async () =>
       (
@@ -167,15 +169,13 @@ async function getAssignableUsers(repo: string) {
         .trim()
         .split("\n")
         .filter(Boolean),
-    err: (e) => createNg(new Error(`error: ${e}`)),
+    err: (e) => createErr(new Error(`error: ${e}`)),
   });
 
   return list;
 }
 
 async function getAvailableLabels(repo: string) {
-  const { checkPromiseReturn, createNg } = resultUtility;
-
   const list = await checkPromiseReturn({
     fn: async () =>
       (
@@ -186,15 +186,13 @@ async function getAvailableLabels(repo: string) {
         .trim()
         .split("\n")
         .filter(Boolean),
-    err: (e) => createNg(new Error(`error: ${e}`)),
+    err: (e) => createErr(new Error(`error: ${e}`)),
   });
 
   return list;
 }
 
 export async function createIssueAction(options: TextareaCreateOptions = {}) {
-  const { checkResultReturn, createNg } = resultUtility;
-  const { optionConversion } = optionUtility;
   const ghIssueDir = join(process.cwd(), ".gh-issue");
 
   if (!existsSync(ghIssueDir)) {
@@ -206,7 +204,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
 
   const issueContents: IssueContents[] = [];
 
-  if (findTemplateResult.isErr) {
+  if (isErr(findTemplateResult)) {
     log.error(`Error: ${findTemplateResult.err.message}`);
     process.exit(1);
   }
@@ -222,10 +220,10 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
         name: `${tmp.name} [form]`,
         contents: tmp.contents,
       })),
-    err: (e) => createNg(e as Error),
+    err: (e) => createErr(e as Error),
   });
 
-  if (yamlTemplates.isErr) {
+  if (isErr(yamlTemplates)) {
     log.error(`Error: ${yamlTemplates.err.message}`);
     process.exit(1);
   }
@@ -238,10 +236,10 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
         name: formatMarkdownTemplateName(fileName),
         contents: readFileSync(join(process.cwd(), ".github", "ISSUE_TEMPLATE", fileName), "utf8"),
       })),
-    err: (e) => createNg(e as Error),
+    err: (e) => createErr(e as Error),
   });
 
-  if (markdownTemplates.isErr) {
+  if (isErr(markdownTemplates)) {
     log.error(`Error: ${markdownTemplates.err.message}`);
     process.exit(1);
   }
@@ -255,7 +253,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
 
   const selectedTemplate = await selectTemplate(selectedMaterial);
 
-  if (selectedTemplate.isErr) {
+  if (isErr(selectedTemplate)) {
     log.error(`Error: ${selectedTemplate.err.message}`);
     process.exit(1);
   }
@@ -264,7 +262,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     templates.find((tmp) => tmp.fileName === selectedTemplate.value),
   );
 
-  if (foundTemplate.isNone) {
+  if (isNone(foundTemplate)) {
     log.error("Error: Selected template not found");
     process.exit(1);
   }
@@ -272,14 +270,14 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   if (foundTemplate.value.kind === "markdown") {
     const markdownDraftResult = await createMarkdownDraft(foundTemplate.value.contents, options);
 
-    if (markdownDraftResult.isErr) {
+    if (isErr(markdownDraftResult)) {
       log.error(`Error: ${markdownDraftResult.err.message}`);
       process.exit(1);
     }
 
     const writeMarkdownResult = await writeRawIssueMarkdown(markdownDraftResult.value);
 
-    if (writeMarkdownResult.isErr) {
+    if (isErr(writeMarkdownResult)) {
       log.error(`Error: ${writeMarkdownResult.err.message}`);
       process.exit(1);
     }
@@ -301,7 +299,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     placeholder: "Issue title",
   });
 
-  if (title.isErr) {
+  if (isErr(title)) {
     log.error(`Error: ${title.err.message}`);
     process.exit(1);
   }
@@ -314,19 +312,19 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   for (const tmp of foundTemplate.value.contents.body) {
     const contentResult = await createContents(tmp, options);
 
-    if (contentResult.isErr) {
+    if (isErr(contentResult)) {
       log.error(`Error: ${contentResult.err.message}`);
       process.exit(1);
     }
 
-    if (contentResult.value.isSome) {
+    if (isSome(contentResult.value)) {
       issueContents.push(contentResult.value.value);
     }
   }
 
   const repository = await getCurrentRepository();
 
-  if (repository.isErr) {
+  if (isErr(repository)) {
     log.error(`Error: ${repository.err.message}`);
     process.exit(1);
   }
@@ -336,7 +334,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     metadataSpinner.start("Fetching repository labels...");
     const availableLabels = await getAvailableLabels(repository.value);
 
-    if (availableLabels.isErr) {
+    if (isErr(availableLabels)) {
       metadataSpinner.stop("Fetching repository labels failed.");
       log.error(`Error: ${availableLabels.err.message}`);
       process.exit(1);
@@ -356,7 +354,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
         })),
       });
 
-      if (labelsResult.isErr) {
+      if (isErr(labelsResult)) {
         log.error(`Error: ${labelsResult.err.message}`);
         process.exit(1);
       }
@@ -377,7 +375,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
           metadataSpinner.start("Fetching assignable users...");
           const result = await getAssignableUsers(repository.value);
 
-          if (result.isErr) {
+          if (isErr(result)) {
             metadataSpinner.stop("Fetching assignable users failed.");
             return result;
           }
@@ -385,9 +383,9 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
           metadataSpinner.stop("Fetched assignable users.");
           return result;
         })()
-      : resultUtility.createOk([]);
+      : createOk([]);
 
-  if (assignees.isErr) {
+  if (isErr(assignees)) {
     log.error(`Error: ${assignees.err.message}`);
     process.exit(1);
   }
@@ -402,7 +400,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
       })),
     });
 
-    if (assigneeResult.isErr) {
+    if (isErr(assigneeResult)) {
       log.error(`Error: ${assigneeResult.err.message}`);
       process.exit(1);
     }
@@ -417,7 +415,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
 
   const writeMarkdownResult = await writeIssueMarkdown(issueContents);
 
-  if (writeMarkdownResult.isErr) {
+  if (isErr(writeMarkdownResult)) {
     log.error(`Error: ${writeMarkdownResult.err.message}`);
     process.exit(1);
   }

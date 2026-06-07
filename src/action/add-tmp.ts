@@ -1,3 +1,4 @@
+import { isErr } from "ts-utility-kit/result";
 import { cancel, log, outro, spinner } from "@clack/prompts";
 import { selectLanguages } from "../command/init";
 import type { Language } from "../command/init";
@@ -84,7 +85,7 @@ async function createCustomMarkdownTemplateWithPrompt() {
     errorMessage: "Failed to select a markdown editor",
   });
 
-  if (inputModeResult.isErr) {
+  if (isErr(inputModeResult)) {
     return inputModeResult;
   }
 
@@ -116,7 +117,7 @@ export async function addTemplateAction() {
     errorMessage: "Failed to select a template mode",
   });
 
-  if (templateMode.isErr) {
+  if (isErr(templateMode)) {
     log.error(`Error: ${templateMode.err.message}`);
     process.exit(1);
   }
@@ -124,7 +125,7 @@ export async function addTemplateAction() {
   if (templateMode.value === "custom") {
     const formatResult = await selectCustomTemplateFormat();
 
-    if (formatResult.isErr) {
+    if (isErr(formatResult)) {
       log.error(`Error: ${formatResult.err.message}`);
       process.exit(1);
     }
@@ -134,7 +135,7 @@ export async function addTemplateAction() {
         ? await createCustomIssueTemplate()
         : await createCustomMarkdownTemplateWithPrompt();
 
-    if (result.isErr) {
+    if (isErr(result)) {
       log.error(`Error: ${result.err.message}`);
       process.exit(1);
     }
@@ -146,7 +147,7 @@ export async function addTemplateAction() {
   const typeResult = await selectBundledTemplateVariants();
   const spin = spinner();
 
-  if (typeResult.isErr) {
+  if (isErr(typeResult)) {
     log.error(`Error: ${typeResult.err.message}`);
     process.exit(1);
   }
@@ -158,7 +159,7 @@ export async function addTemplateAction() {
 
   const langResult = await selectLanguages();
 
-  if (langResult.isErr) {
+  if (isErr(langResult)) {
     log.error(`Error: ${langResult.err.message}`);
     process.exit(1);
   }
@@ -204,7 +205,7 @@ export async function addTemplateAction() {
       cwd: templateDir,
     });
 
-    if (res.isErr) {
+    if (isErr(res)) {
       spin.error(`Error: ${res.err.message}`);
       process.exit(1);
     }

@@ -1,8 +1,9 @@
 import { randomInt } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { optionUtility, resultUtility } from "ts-utility-kit";
-import type { Result } from "ts-utility-kit";
+import { optionConversion } from "ts-utility-kit/option";
+import { checkPromiseReturn, createErr, createOk, isErr, isOk } from "ts-utility-kit/result";
+import type { Result } from "ts-utility-kit/result";
 import type { IssueContents } from "./create-contents";
 
 const TITLE_KEY = "title";
@@ -34,13 +35,12 @@ const fileNameNouns = [
 ];
 
 export function createIssueMarkdown(issueContents: IssueContents[]): Result<string, Error> {
-  const { createNg, createOk } = resultUtility;
   const titleContent = issueContents.find((content) => content.title === TITLE_KEY);
   const labelContent = issueContents.find((content) => content.title === LABEL_KEY);
   const assignContent = issueContents.find((content) => content.title === ASSIGN_KEY);
 
   if (!titleContent) {
-    return createNg(new Error("Title content is required"));
+    return createErr(new Error("Title content is required"));
   }
 
   const bodyContents = issueContents.filter(
@@ -78,17 +78,15 @@ async function writeUniqueMarkdownFile(
   markdown: string,
   cwd = process.cwd(),
 ): Promise<Result<string, Error>> {
-  const { checkPromiseReturn, createNg, createOk } = resultUtility;
-  const { optionConversion } = optionUtility;
   const ghIssueDir = join(cwd, ".gh-issue");
 
   const mkdirResult = await checkPromiseReturn({
     fn: async () => optionConversion(await mkdir(ghIssueDir, { recursive: true })),
-    err: (error) => createNg(error as Error),
+    err: (error) => createErr(error as Error),
   });
 
-  if (mkdirResult.isErr) {
-    return mkdirResult;
+  if (isErr(mkdirResult)) {
+    return createErr(mkdirResult.err);
   }
 
   for (let attempt = 0; attempt < 10; attempt++) {
@@ -97,10 +95,10 @@ async function writeUniqueMarkdownFile(
 
     const writeResult = await checkPromiseReturn({
       fn: async () => optionConversion(await writeFile(filePath, markdown, { flag: "wx" })),
-      err: (error) => createNg(error as Error),
+      err: (error) => createErr(error as Error),
     });
 
-    if (writeResult.isOk) {
+    if (isOk(writeResult)) {
       return createOk(filePath);
     }
 
@@ -115,7 +113,7 @@ async function writeUniqueMarkdownFile(
     return writeResult;
   }
 
-  return createNg(new Error("Failed to generate a unique markdown file name"));
+  return createErr(new Error("Failed to generate a unique markdown file name"));
 }
 
 export async function writeIssueMarkdown(
@@ -124,7 +122,7 @@ export async function writeIssueMarkdown(
 ): Promise<Result<string, Error>> {
   const markdownResult = createIssueMarkdown(issueContents);
 
-  if (markdownResult.isErr) {
+  if (isErr(markdownResult)) {
     return markdownResult;
   }
 

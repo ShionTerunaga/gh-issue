@@ -3,6 +3,7 @@ import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promi
 import { basename } from "node:path";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { isErr, isOk } from "ts-utility-kit/result";
 import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 
 import { parseDraftIssue } from "../src/helper/draft-issue";
@@ -175,9 +176,9 @@ describe("editTextareaWithVim", () => {
       initialValue: "Initial value",
     });
 
-    expect(result.isOk).toBe(true);
+    expect(isOk(result)).toBe(true);
 
-    if (result.isErr) {
+    if (isErr(result)) {
       throw result.err;
     }
 
@@ -196,9 +197,9 @@ describe("createIssueMarkdown", () => {
       { title: "Details", contents: "Body text" },
     ]);
 
-    expect(result.isOk).toBe(true);
+    expect(isOk(result)).toBe(true);
 
-    if (result.isErr) {
+    if (isErr(result)) {
       throw result.err;
     }
 
@@ -214,9 +215,9 @@ describe("createIssueMarkdown", () => {
       { title: "Details", contents: "Body text" },
     ]);
 
-    expect(result.isOk).toBe(true);
+    expect(isOk(result)).toBe(true);
 
-    if (result.isErr) {
+    if (isErr(result)) {
       throw result.err;
     }
 

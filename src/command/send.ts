@@ -1,4 +1,4 @@
-import type { Result } from "ts-utility-kit";
+import type { Result } from "ts-utility-kit/result";
 import { multiselectPrompts } from "./common";
 
 export async function selectDraftIssues(draftFiles: string[]): Promise<Result<string[], Error>> {

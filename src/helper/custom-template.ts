@@ -2,7 +2,10 @@ import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { dump } from "js-yaml";
-import { optionUtility, resultUtility } from "ts-utility-kit";
+import { createNone, createSome, isSome } from "ts-utility-kit/option";
+import type { Option } from "ts-utility-kit/option";
+import { createErr, createOk, isErr } from "ts-utility-kit/result";
+import type { Result } from "ts-utility-kit/result";
 import type { IssueFormElement, IssueTemplate } from "./issue-tyepe";
 import {
   confirmPrompts,
@@ -82,64 +85,70 @@ export function createUniqueFieldId(label: string, usedIds: Set<string>) {
 /**
  * Prompts for optional multi-line text after confirming whether to edit it.
  */
-async function promptOptionalLongText(message: string) {
+async function promptOptionalLongText(message: string): Promise<Result<Option<string>, Error>> {
   const shouldEdit = await confirmPrompts({
     message,
     initialValue: false,
   });
 
-  if (shouldEdit.isErr) {
+  if (isErr(shouldEdit)) {
     return shouldEdit;
   }
 
   if (!shouldEdit.value) {
-    return resultUtility.createOk(optionUtility.createNone());
+    return createOk(createNone());
   }
 
   const content = await multilineTextPrompts({
     message,
   });
 
-  if (content.isErr) {
+  if (isErr(content)) {
     return content;
   }
 
-  return resultUtility.createOk(optionUtility.createSome(content.value));
+  return createOk(createSome(content.value));
 }
 
 /**
  * Prompts for optional single-line text and trims the result.
  */
-async function promptOptionalText(message: string, placeholder?: string) {
+async function promptOptionalText(
+  message: string,
+  placeholder?: string,
+): Promise<Result<string, Error>> {
   const value = await textPrompts({
     message,
     placeholder,
   });
 
-  if (value.isErr) {
+  if (isErr(value)) {
     return value;
   }
 
   const trimmed = value.value.trim();
 
-  return resultUtility.createOk(trimmed);
+  return createOk(trimmed);
 }
 
 /**
  * Prompts for required single-line text and rejects empty input.
  */
-async function promptRequiredText(message: string, placeholder?: string) {
+async function promptRequiredText(
+  message: string,
+  placeholder?: string,
+): Promise<Result<string, Error>> {
   const value = await textPrompts({
     message,
     placeholder,
   });
 
-  if (value.isErr) {
+  if (isErr(value)) {
     return value;
   }
 
   if (value.value.trim().length === 0) {
-    return resultUtility.createNg(new Error("This field is required"));
+    return createErr(new Error("This field is required"));
   }
 
   return value;
@@ -169,13 +178,13 @@ async function promptBodyElementType() {
 async function promptCommonFieldMetadata(usedIds: Set<string>) {
   const label = await promptRequiredText("Field label");
 
-  if (label.isErr) {
+  if (isErr(label)) {
     return label;
   }
 
   const description = await promptOptionalLongText("Add a description?");
 
-  if (description.isErr) {
+  if (isErr(description)) {
     return description;
   }
 
@@ -184,14 +193,14 @@ async function promptCommonFieldMetadata(usedIds: Set<string>) {
     initialValue: false,
   });
 
-  if (required.isErr) {
+  if (isErr(required)) {
     return required;
   }
 
-  return resultUtility.createOk({
+  return createOk({
     id: createUniqueFieldId(label.value, usedIds),
     label: label.value,
-    description: description.value.isSome ? description.value.value : undefined,
+    description: isSome(description.value) ? description.value.value : undefined,
     required: required.value,
   });
 }
@@ -204,11 +213,11 @@ async function promptMarkdownElement() {
     message: "Markdown body",
   });
 
-  if (value.isErr) {
+  if (isErr(value)) {
     return value;
   }
 
-  return resultUtility.createOk<IssueFormElement>({
+  return createOk<IssueFormElement>({
     type: "markdown",
     attributes: {
       value: value.value,
@@ -222,30 +231,30 @@ async function promptMarkdownElement() {
 async function promptInputElement(usedIds: Set<string>) {
   const metadata = await promptCommonFieldMetadata(usedIds);
 
-  if (metadata.isErr) {
+  if (isErr(metadata)) {
     return metadata;
   }
 
   const placeholder = await promptOptionalLongText("Add a placeholder?");
 
-  if (placeholder.isErr) {
+  if (isErr(placeholder)) {
     return placeholder;
   }
 
   const value = await promptOptionalLongText("Add an initial value?");
 
-  if (value.isErr) {
+  if (isErr(value)) {
     return value;
   }
 
-  return resultUtility.createOk<IssueFormElement>({
+  return createOk<IssueFormElement>({
     type: "input",
     id: metadata.value.id,
     attributes: {
       label: metadata.value.label,
       description: metadata.value.description,
-      placeholder: placeholder.value.isSome ? placeholder.value.value : undefined,
-      value: value.value.isSome ? value.value.value : undefined,
+      placeholder: isSome(placeholder.value) ? placeholder.value.value : undefined,
+      value: isSome(value.value) ? value.value.value : undefined,
     },
     validations: {
       required: metadata.value.required,
@@ -259,36 +268,36 @@ async function promptInputElement(usedIds: Set<string>) {
 async function promptTextareaElement(usedIds: Set<string>) {
   const metadata = await promptCommonFieldMetadata(usedIds);
 
-  if (metadata.isErr) {
+  if (isErr(metadata)) {
     return metadata;
   }
 
   const placeholder = await promptOptionalLongText("Add a placeholder?");
 
-  if (placeholder.isErr) {
+  if (isErr(placeholder)) {
     return placeholder;
   }
 
   const value = await promptOptionalLongText("Add an initial value?");
 
-  if (value.isErr) {
+  if (isErr(value)) {
     return value;
   }
 
   const render = await promptOptionalText("Render mode (optional)", "shell");
 
-  if (render.isErr) {
+  if (isErr(render)) {
     return render;
   }
 
-  return resultUtility.createOk<IssueFormElement>({
+  return createOk<IssueFormElement>({
     type: "textarea",
     id: metadata.value.id,
     attributes: {
       label: metadata.value.label,
       description: metadata.value.description,
-      placeholder: placeholder.value.isSome ? placeholder.value.value : undefined,
-      value: value.value.isSome ? value.value.value : undefined,
+      placeholder: isSome(placeholder.value) ? placeholder.value.value : undefined,
+      value: isSome(value.value) ? value.value.value : undefined,
       render: render.value.length > 0 ? render.value : undefined,
     },
     validations: {
@@ -303,7 +312,7 @@ async function promptTextareaElement(usedIds: Set<string>) {
 async function promptDropdownElement(usedIds: Set<string>) {
   const metadata = await promptCommonFieldMetadata(usedIds);
 
-  if (metadata.isErr) {
+  if (isErr(metadata)) {
     return metadata;
   }
 
@@ -312,7 +321,7 @@ async function promptDropdownElement(usedIds: Set<string>) {
     initialValue: false,
   });
 
-  if (multiple.isErr) {
+  if (isErr(multiple)) {
     return multiple;
   }
 
@@ -321,7 +330,7 @@ async function promptDropdownElement(usedIds: Set<string>) {
   while (true) {
     const option = await promptRequiredText(`Dropdown option ${options.length + 1}`);
 
-    if (option.isErr) {
+    if (isErr(option)) {
       return option;
     }
 
@@ -332,7 +341,7 @@ async function promptDropdownElement(usedIds: Set<string>) {
       initialValue: true,
     });
 
-    if (addMore.isErr) {
+    if (isErr(addMore)) {
       return addMore;
     }
 
@@ -349,13 +358,15 @@ async function promptDropdownElement(usedIds: Set<string>) {
     max: options.length - 1,
   });
 
-  if (defaultIndex.isErr) {
+  if (isErr(defaultIndex)) {
     return defaultIndex;
   }
 
-  const parsedDefault = defaultIndex.value.isSome ? defaultIndex.value.value : undefined;
+  const parsedDefault = isSome(defaultIndex.value)
+    ? defaultIndex.value.value
+    : undefined;
 
-  return resultUtility.createOk<IssueFormElement>({
+  return createOk<IssueFormElement>({
     type: "dropdown",
     id: metadata.value.id,
     attributes: {
@@ -377,7 +388,7 @@ async function promptDropdownElement(usedIds: Set<string>) {
 async function promptCheckboxesElement(usedIds: Set<string>) {
   const metadata = await promptCommonFieldMetadata(usedIds);
 
-  if (metadata.isErr) {
+  if (isErr(metadata)) {
     return metadata;
   }
 
@@ -386,7 +397,7 @@ async function promptCheckboxesElement(usedIds: Set<string>) {
   while (true) {
     const label = await promptRequiredText(`Checkbox option ${options.length + 1}`);
 
-    if (label.isErr) {
+    if (isErr(label)) {
       return label;
     }
 
@@ -395,7 +406,7 @@ async function promptCheckboxesElement(usedIds: Set<string>) {
       initialValue: false,
     });
 
-    if (required.isErr) {
+    if (isErr(required)) {
       return required;
     }
 
@@ -409,7 +420,7 @@ async function promptCheckboxesElement(usedIds: Set<string>) {
       initialValue: true,
     });
 
-    if (addMore.isErr) {
+    if (isErr(addMore)) {
       return addMore;
     }
 
@@ -418,7 +429,7 @@ async function promptCheckboxesElement(usedIds: Set<string>) {
     }
   }
 
-  return resultUtility.createOk<IssueFormElement>({
+  return createOk<IssueFormElement>({
     type: "checkboxes",
     id: metadata.value.id,
     attributes: {
@@ -438,11 +449,11 @@ async function promptCheckboxesElement(usedIds: Set<string>) {
 async function promptUploadElement(usedIds: Set<string>) {
   const metadata = await promptCommonFieldMetadata(usedIds);
 
-  if (metadata.isErr) {
+  if (isErr(metadata)) {
     return metadata;
   }
 
-  return resultUtility.createOk<IssueFormElement>({
+  return createOk<IssueFormElement>({
     type: "upload",
     id: metadata.value.id,
     attributes: {
@@ -465,7 +476,7 @@ async function promptBodyElements() {
   while (true) {
     const nextType = await promptBodyElementType();
 
-    if (nextType.isErr) {
+    if (isErr(nextType)) {
       return nextType;
     }
 
@@ -475,12 +486,12 @@ async function promptBodyElements() {
         initialValue: true,
       });
 
-      if (shouldFinish.isErr) {
+      if (isErr(shouldFinish)) {
         return shouldFinish;
       }
 
       if (shouldFinish.value) {
-        return resultUtility.createOk(body);
+        return createOk(body);
       }
 
       continue;
@@ -499,7 +510,7 @@ async function promptBodyElements() {
                 ? await promptCheckboxesElement(usedIds)
                 : await promptUploadElement(usedIds);
 
-    if (element.isErr) {
+    if (isErr(element)) {
       return element;
     }
 
@@ -513,37 +524,37 @@ async function promptBodyElements() {
 export async function createCustomIssueTemplate(cwd = process.cwd()) {
   const fileName = await promptRequiredText("Template file name", "custom_issue");
 
-  if (fileName.isErr) {
+  if (isErr(fileName)) {
     return fileName;
   }
 
   const name = await promptRequiredText("Template name");
 
-  if (name.isErr) {
+  if (isErr(name)) {
     return name;
   }
 
   const description = await promptOptionalLongText("Add a template description?");
 
-  if (description.isErr) {
+  if (isErr(description)) {
     return description;
   }
 
   const title = await promptOptionalText("Default issue title prefix (optional)");
 
-  if (title.isErr) {
+  if (isErr(title)) {
     return title;
   }
 
   const body = await promptBodyElements();
 
-  if (body.isErr) {
+  if (isErr(body)) {
     return body;
   }
 
   const contents: IssueTemplate = {
     name: name.value,
-    description: description.value.isSome ? description.value.value : undefined,
+    description: isSome(description.value) ? description.value.value : undefined,
     title: title.value.length > 0 ? title.value : undefined,
     body: body.value,
   };
@@ -552,7 +563,7 @@ export async function createCustomIssueTemplate(cwd = process.cwd()) {
   const targetPath = join(issueTemplateDir, normalizeTemplateFileName(fileName.value));
 
   if (existsSync(targetPath)) {
-    return resultUtility.createNg(new Error(`Already exists ${targetPath}`));
+    return createErr(new Error(`Already exists ${targetPath}`));
   }
 
   await mkdir(issueTemplateDir, { recursive: true });
@@ -560,7 +571,7 @@ export async function createCustomIssueTemplate(cwd = process.cwd()) {
     flag: "wx",
   });
 
-  return resultUtility.createOk(targetPath);
+  return createOk(targetPath);
 }
 
 /**
@@ -575,13 +586,13 @@ export async function createCustomMarkdownTemplate({
 }) {
   const fileName = await promptRequiredText("Template file name", "custom_issue");
 
-  if (fileName.isErr) {
+  if (isErr(fileName)) {
     return fileName;
   }
 
   const templateTitle = await promptRequiredText("Template title");
 
-  if (templateTitle.isErr) {
+  if (isErr(templateTitle)) {
     return templateTitle;
   }
 
@@ -598,19 +609,19 @@ export async function createCustomMarkdownTemplate({
           errorMessage: "Failed to enter markdown template body",
         });
 
-  if (markdownResult.isErr) {
+  if (isErr(markdownResult)) {
     return markdownResult;
   }
 
   if (markdownResult.value.trim().length === 0) {
-    return resultUtility.createNg(new Error("Markdown template cannot be empty"));
+    return createErr(new Error("Markdown template cannot be empty"));
   }
 
   const issueTemplateDir = join(cwd, ".github", "ISSUE_TEMPLATE");
   const targetPath = join(issueTemplateDir, normalizeMarkdownTemplateFileName(fileName.value));
 
   if (existsSync(targetPath)) {
-    return resultUtility.createNg(new Error(`Already exists ${targetPath}`));
+    return createErr(new Error(`Already exists ${targetPath}`));
   }
 
   await mkdir(issueTemplateDir, { recursive: true });
@@ -620,5 +631,5 @@ export async function createCustomMarkdownTemplate({
     { flag: "wx" },
   );
 
-  return resultUtility.createOk(targetPath);
+  return createOk(targetPath);
 }

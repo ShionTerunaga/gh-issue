@@ -1,3 +1,4 @@
+import { isErr } from "ts-utility-kit/result";
 import { mkdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -29,7 +30,7 @@ export async function initAction() {
 
   const shouldCreateTemplates = await confirmCreateTemplates();
 
-  if (shouldCreateTemplates.isErr) {
+  if (isErr(shouldCreateTemplates)) {
     log.error(`Error: ${shouldCreateTemplates.err.message}`);
     process.exit(1);
   }
@@ -50,7 +51,7 @@ export async function initAction() {
 
   const typeResult = await selectIssueTemplateTypes();
 
-  if (typeResult.isErr) {
+  if (isErr(typeResult)) {
     log.error(`Error: ${typeResult.err.message}`);
     process.exit(1);
   }
@@ -62,7 +63,7 @@ export async function initAction() {
 
   const langResult = await selectLanguages();
 
-  if (langResult.isErr) {
+  if (isErr(langResult)) {
     log.error(`Error: ${langResult.err.message}`);
     process.exit(1);
   }
@@ -74,7 +75,7 @@ export async function initAction() {
 
   const isComfirmed = await confirmInit();
 
-  if (isComfirmed.isErr) {
+  if (isErr(isComfirmed)) {
     log.error(`Error: ${isComfirmed.err.message}`);
     process.exit(1);
   }
@@ -119,7 +120,7 @@ export async function initAction() {
       cwd: templateDir,
     });
 
-    if (res.isErr) {
+    if (isErr(res)) {
       spin.error(`Error: ${res.err.message}`);
       process.exit(1);
     }

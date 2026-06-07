@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import fastGlob from "fast-glob";
-import { resultUtility } from "ts-utility-kit";
-import type { Result } from "ts-utility-kit";
+import { checkPromiseReturn, createErr, createOk, isErr } from "ts-utility-kit/result";
+import type { Result } from "ts-utility-kit/result";
 
 const DRAFTS_DIR = ".gh-issue";
 const README_FILE = `${DRAFTS_DIR}/README.md`;
@@ -16,7 +16,6 @@ export interface DraftIssue {
 }
 
 export async function findDraftIssues(cwd = process.cwd()): Promise<Result<string[], Error>> {
-  const { checkPromiseReturn, createNg, createOk } = resultUtility;
   const result = await checkPromiseReturn({
     fn: () =>
       fastGlob(`${DRAFTS_DIR}/**/*.md`, {
@@ -24,10 +23,10 @@ export async function findDraftIssues(cwd = process.cwd()): Promise<Result<strin
         onlyFiles: true,
         dot: true,
       }),
-    err: (error) => createNg(error as Error),
+    err: (error) => createErr(error as Error),
   });
 
-  if (result.isErr) {
+  if (isErr(result)) {
     return result;
   }
 
