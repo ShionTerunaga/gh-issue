@@ -64,8 +64,7 @@ export async function confirmInit(): Promise<Result<boolean, Error>> {
       await confirm({
         message: `This will create issue templates in .github/ISSUE_TEMPLATE. Do you want to continue?`,
       }),
-    err: (e) =>
-      createErr(createPromptError("Failed to get user confirmation", e)),
+    err: (e) => createErr(createPromptError("Failed to get user confirmation", e)),
   });
 
   if (isErr(response)) {
@@ -86,8 +85,7 @@ export async function confirmCreateTemplates(): Promise<Result<boolean, Error>> 
       await confirm({
         message: `Do you want to create issue templates in .github/ISSUE_TEMPLATE?`,
       }),
-    err: (e) =>
-      createErr(createPromptError("Failed to get user confirmation", e)),
+    err: (e) => createErr(createPromptError("Failed to get user confirmation", e)),
   });
 
   if (isErr(response)) {

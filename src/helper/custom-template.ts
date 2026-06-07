@@ -362,9 +362,7 @@ async function promptDropdownElement(usedIds: Set<string>) {
     return defaultIndex;
   }
 
-  const parsedDefault = isSome(defaultIndex.value)
-    ? defaultIndex.value.value
-    : undefined;
+  const parsedDefault = isSome(defaultIndex.value) ? defaultIndex.value.value : undefined;
 
   return createOk<IssueFormElement>({
     type: "dropdown",

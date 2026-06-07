@@ -6,7 +6,13 @@ import { promisify } from "node:util";
 import { bold, green } from "picocolors";
 import { findDraftIssues, parseDraftIssue } from "../helper/draft-issue";
 import { selectDraftIssues } from "../command/send";
-import { checkPromiseReturn, checkPromiseVoid, createErr, createOk, isErr } from "ts-utility-kit/result";
+import {
+  checkPromiseReturn,
+  checkPromiseVoid,
+  createErr,
+  createOk,
+  isErr,
+} from "ts-utility-kit/result";
 
 const execFileAsync = promisify(execFile);
 
