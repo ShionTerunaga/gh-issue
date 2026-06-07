@@ -3,8 +3,15 @@ import { randomUUID } from "node:crypto";
 import { readFile, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resultUtility } from "ts-utility-kit";
-import type { Result } from "ts-utility-kit";
+import {
+  checkPromiseReturn,
+  checkPromiseVoid,
+  checkResultVoid,
+  createErr,
+  createOk,
+  isErr,
+} from "ts-utility-kit/result";
+import type { Result } from "ts-utility-kit/result";
 
 const COMMENT_START = "<!-- gh-issue:";
 const COMMENT_END = "-->";
@@ -69,8 +76,6 @@ export async function editTextareaWithVim({
   title?: string;
   description?: string;
 }): Promise<Result<string, Error>> {
-  const { checkPromiseReturn, checkPromiseVoid, createNg, createOk, checkResultVoid } =
-    resultUtility;
   const filePath = createHiddenFilePath();
 
   try {
@@ -86,28 +91,28 @@ export async function editTextareaWithVim({
           { flag: "wx" },
         );
       },
-      err: (error) => createNg(error as Error),
+      err: (error) => createErr(error as Error),
     });
 
-    if (writeResult.isErr) {
-      return writeResult;
+    if (isErr(writeResult)) {
+      return createErr(writeResult.err);
     }
 
     const checkResult = checkResultVoid({
       fn: () => openVim(filePath),
-      err: (error) => createNg(error as Error),
+      err: (error) => createErr(error as Error),
     });
 
-    if (checkResult.isErr) {
-      return checkResult;
+    if (isErr(checkResult)) {
+      return createErr(checkResult.err);
     }
 
     const readResult = await checkPromiseReturn({
       fn: async () => await readFile(filePath, "utf8"),
-      err: (error) => createNg(error as Error),
+      err: (error) => createErr(error as Error),
     });
 
-    if (readResult.isErr) {
+    if (isErr(readResult)) {
       return readResult;
     }
 

@@ -1,14 +1,13 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "path";
-import { resultUtility } from "ts-utility-kit";
-import type { Result } from "ts-utility-kit";
+import { createErr, createOk } from "ts-utility-kit/result";
+import type { Result } from "ts-utility-kit/result";
 
 export function findTemplates(): Result<string[], Error> {
-  const { createNg, createOk } = resultUtility;
   const githubDir = join(process.cwd(), ".github", "ISSUE_TEMPLATE");
 
   if (!existsSync(githubDir)) {
-    return createNg(new Error(".github/ISSUE_TEMPLATE directory does not exist"));
+    return createErr(new Error(".github/ISSUE_TEMPLATE directory does not exist"));
   }
 
   const templates = readdirSync(githubDir, { withFileTypes: true })
@@ -16,7 +15,7 @@ export function findTemplates(): Result<string[], Error> {
     .map((entry) => entry.name);
 
   if (templates.length === 0) {
-    return createNg(new Error("No issue templates found in .github/ISSUE_TEMPLATE"));
+    return createErr(new Error("No issue templates found in .github/ISSUE_TEMPLATE"));
   }
 
   return createOk(templates);

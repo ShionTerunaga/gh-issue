@@ -6,7 +6,13 @@ import { promisify } from "node:util";
 import { bold, green } from "picocolors";
 import { findDraftIssues, parseDraftIssue } from "../helper/draft-issue";
 import { selectDraftIssues } from "../command/send";
-import { resultUtility } from "ts-utility-kit";
+import {
+  checkPromiseReturn,
+  checkPromiseVoid,
+  createErr,
+  createOk,
+  isErr,
+} from "ts-utility-kit/result";
 
 const execFileAsync = promisify(execFile);
 
@@ -47,10 +53,9 @@ async function createIssueWithGh(issue: {
 
 export async function sendIssueAction(options: { all?: boolean } = {}) {
   const isAll = options.all || process.env.npm_config_all === "true";
-  const { checkPromiseReturn, checkPromiseVoid, createNg, createOk } = resultUtility;
   const draftFilesResult = await findDraftIssues();
 
-  if (draftFilesResult.isErr) {
+  if (isErr(draftFilesResult)) {
     log.error(`Error: ${draftFilesResult.err.message}`);
     process.exit(1);
   }
@@ -64,7 +69,7 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
     ? createOk(draftFilesResult.value)
     : await selectDraftIssues(draftFilesResult.value);
 
-  if (selectedIssues.isErr) {
+  if (isErr(selectedIssues)) {
     log.error(`Error: ${selectedIssues.err.message}`);
     process.exit(1);
   }
@@ -72,14 +77,14 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
   const authResult = await checkPromiseVoid({
     fn: async () => await verifyGhAuth(),
     err: (e) =>
-      createNg(
+      createErr(
         new Error(
           `gh authentication check failed. Please run \`gh auth login\`: ${e instanceof Error ? e.message : "Unknown error"}`,
         ),
       ),
   });
 
-  if (authResult.isErr) {
+  if (isErr(authResult)) {
     log.error(`Error: ${authResult.err.message}`);
     process.exit(1);
   }
@@ -87,14 +92,14 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
   const repositoryResult = await checkPromiseReturn({
     fn: async () => await resolveRepository(),
     err: (e) =>
-      createNg(
+      createErr(
         new Error(
           `Failed to resolve the current GitHub repository. Please check the git remote and gh repository access: ${e instanceof Error ? e.message : "Unknown error"}`,
         ),
       ),
   });
 
-  if (repositoryResult.isErr) {
+  if (isErr(repositoryResult)) {
     log.error(`Error: ${repositoryResult.err.message}`);
     process.exit(1);
   }
@@ -110,14 +115,14 @@ export async function sendIssueAction(options: { all?: boolean } = {}) {
     const issueUrl = await checkPromiseReturn({
       fn: async () => await createIssueWithGh(issue),
       err: (e) =>
-        createNg(
+        createErr(
           new Error(
             `Failed to create issue for ${selectedDraft} with gh CLI: ${e instanceof Error ? e.message : "Unknown error"}`,
           ),
         ),
     });
 
-    if (issueUrl.isErr) {
+    if (isErr(issueUrl)) {
       spin.cancel(`Failed to send issue draft: ${selectedDraft}\nError: ${issueUrl.err.message}`);
       process.exit(1);
     }

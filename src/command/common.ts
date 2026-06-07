@@ -8,8 +8,10 @@ import {
   text,
   confirm,
 } from "@clack/prompts";
-import { resultUtility } from "ts-utility-kit";
-import { type Result, type Option, optionUtility } from "ts-utility-kit";
+import { checkPromiseReturn, createErr, createOk, isErr } from "ts-utility-kit/result";
+import type { Result } from "ts-utility-kit/result";
+import { createNone, createSome } from "ts-utility-kit/option";
+import type { Option } from "ts-utility-kit/option";
 import { createPromptError } from "../shared/error";
 import { bold } from "picocolors";
 
@@ -52,18 +54,16 @@ export async function textPrompts({
   cancelMessage?: string;
   errorMessage?: string;
 }): Promise<Result<string, Error>> {
-  const { checkPromiseReturn, createNg, createOk } = resultUtility;
-
   const result = await checkPromiseReturn({
     fn: async () =>
       await text({
         message,
         placeholder,
       }),
-    err: (e) => createNg(createPromptError(errorMessage, e)),
+    err: (e) => createErr(createPromptError(errorMessage, e)),
   });
 
-  if (result.isErr) {
+  if (isErr(result)) {
     return result;
   }
 
@@ -95,9 +95,6 @@ export async function numberPrompts({
   min?: number;
   max?: number;
 }): Promise<Result<Option<number>, Error>> {
-  const { checkPromiseReturn, createNg, createOk } = resultUtility;
-  const { createNone, createSome } = optionUtility;
-
   const result = await checkPromiseReturn({
     fn: async () =>
       await text({
@@ -131,10 +128,10 @@ export async function numberPrompts({
           return Number.isInteger(parsedValue) ? undefined : "Enter a whole number";
         },
       }),
-    err: (e) => createNg(createPromptError(errorMessage, e)),
+    err: (e) => createErr(createPromptError(errorMessage, e)),
   });
 
-  if (result.isErr) {
+  if (isErr(result)) {
     return result;
   }
 
@@ -152,7 +149,7 @@ export async function numberPrompts({
   const parsedValue = Number.parseInt(trimmed, 10);
 
   if (Number.isNaN(parsedValue)) {
-    return createNg(new Error("Failed to parse the input as a whole number"));
+    return createErr(new Error("Failed to parse the input as a whole number"));
   }
 
   return createOk(createSome(parsedValue));
@@ -174,8 +171,6 @@ export async function multilineTextPrompts({
   cancelMessage?: string;
   errorMessage?: string;
 }): Promise<Result<string, Error>> {
-  const { checkPromiseReturn, createNg, createOk } = resultUtility;
-
   log.message(`${bold("To send, press the Tab key and then press Enter.")}\n`);
 
   const result = await checkPromiseReturn({
@@ -186,10 +181,10 @@ export async function multilineTextPrompts({
         placeholder,
         showSubmit: true,
       }),
-    err: (e) => createNg(createPromptError(errorMessage, e)),
+    err: (e) => createErr(createPromptError(errorMessage, e)),
   });
 
-  if (result.isErr) {
+  if (isErr(result)) {
     return result;
   }
 
@@ -215,8 +210,6 @@ export async function selectPrompts<T extends PromptValue>({
   cancelMessage?: string;
   errorMessage?: string;
 }): Promise<Result<T, Error>> {
-  const { createNg, createOk, checkPromiseReturn } = resultUtility;
-
   const initialValue = options.find((option) => option.selected)?.value;
   const result = await checkPromiseReturn({
     fn: async () =>
@@ -225,10 +218,10 @@ export async function selectPrompts<T extends PromptValue>({
         initialValue,
         options: options.map((option) => toClackOption(option)) as never,
       }),
-    err: (e) => createNg(createPromptError(errorMessage, e)),
+    err: (e) => createErr(createPromptError(errorMessage, e)),
   });
 
-  if (result.isErr) {
+  if (isErr(result)) {
     return result;
   }
 
@@ -256,8 +249,6 @@ export async function multiselectPrompts<T extends PromptValue>({
   cancelMessage?: string;
   errorMessage?: string;
 }): Promise<Result<T[], Error>> {
-  const { createNg, createOk, checkPromiseReturn } = resultUtility;
-
   const initialValues = options.filter((option) => option.selected).map((option) => option.value);
 
   const result = await checkPromiseReturn({
@@ -268,10 +259,10 @@ export async function multiselectPrompts<T extends PromptValue>({
         initialValues,
         options: options.map((option) => toClackOption(option)) as never,
       }),
-    err: (e) => createNg(createPromptError(errorMessage, e)),
+    err: (e) => createErr(createPromptError(errorMessage, e)),
   });
 
-  if (result.isErr) {
+  if (isErr(result)) {
     return result;
   }
 
@@ -297,18 +288,16 @@ export async function confirmPrompts({
   cancelMessage?: string;
   errorMessage?: string;
 }): Promise<Result<boolean, Error>> {
-  const { createNg, createOk, checkPromiseReturn } = resultUtility;
-
   const result = await checkPromiseReturn({
     fn: async () =>
       await confirm({
         message,
         initialValue,
       }),
-    err: (e) => createNg(createPromptError(errorMessage, e)),
+    err: (e) => createErr(createPromptError(errorMessage, e)),
   });
 
-  if (result.isErr) {
+  if (isErr(result)) {
     return result;
   }
 

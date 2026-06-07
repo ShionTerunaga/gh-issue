@@ -1,5 +1,5 @@
-import { optionUtility } from "ts-utility-kit";
-import type { Option } from "ts-utility-kit";
+import { createNone, createSome } from "ts-utility-kit/option";
+import type { Option } from "ts-utility-kit/option";
 import type { PromptOption } from "../command/common";
 
 export type TextareaEditorMode = "vim" | "direct";
@@ -26,8 +26,6 @@ export const requiredTextareaEditorModeOptions: PromptOption<TextareaEditorMode>
 export function resolveTextareaEditorMode(
   options?: TextareaCreateOptions,
 ): Option<TextareaEditorMode> {
-  const { createNone, createSome } = optionUtility;
-
   if (options?.vim === true) {
     return createSome("vim");
   }

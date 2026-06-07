@@ -1,5 +1,6 @@
-import { resultUtility } from "ts-utility-kit";
-import type { Option, Result } from "ts-utility-kit";
+import { checkPromiseReturn, createErr, createOk, isErr } from "ts-utility-kit/result";
+import type { Result } from "ts-utility-kit/result";
+import type { Option } from "ts-utility-kit/option";
 import { createPromptError } from "../shared/error";
 import { cancel, confirm, isCancel } from "@clack/prompts";
 import { multiselectPrompts, type PromptOption } from "./common";
@@ -58,17 +59,15 @@ export async function selectLanguages(): Promise<Result<Language[], Error>> {
 }
 
 export async function confirmInit(): Promise<Result<boolean, Error>> {
-  const { checkPromiseReturn, createNg, createOk } = resultUtility;
-
   const response = await checkPromiseReturn({
     fn: async () =>
       await confirm({
         message: `This will create issue templates in .github/ISSUE_TEMPLATE. Do you want to continue?`,
       }),
-    err: (e) => createNg(createPromptError("Failed to get user confirmation", e)),
+    err: (e) => createErr(createPromptError("Failed to get user confirmation", e)),
   });
 
-  if (response.isErr) {
+  if (isErr(response)) {
     return response;
   }
 
@@ -81,17 +80,15 @@ export async function confirmInit(): Promise<Result<boolean, Error>> {
 }
 
 export async function confirmCreateTemplates(): Promise<Result<boolean, Error>> {
-  const { checkPromiseReturn, createNg, createOk } = resultUtility;
-
   const response = await checkPromiseReturn({
     fn: async () =>
       await confirm({
         message: `Do you want to create issue templates in .github/ISSUE_TEMPLATE?`,
       }),
-    err: (e) => createNg(createPromptError("Failed to get user confirmation", e)),
+    err: (e) => createErr(createPromptError("Failed to get user confirmation", e)),
   });
 
-  if (response.isErr) {
+  if (isErr(response)) {
     return response;
   }
 
