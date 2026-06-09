@@ -1,4 +1,5 @@
 import {
+  autocompleteMultiselect,
   cancel,
   isCancel,
   log,
@@ -256,6 +257,50 @@ export async function multiselectPrompts<T extends PromptValue>({
       await multiselect({
         message,
         required,
+        initialValues,
+        options: options.map((option) => toClackOption(option)) as never,
+      }),
+    err: (e) => createErr(createPromptError(errorMessage, e)),
+  });
+
+  if (isErr(result)) {
+    return result;
+  }
+
+  if (isCancel(result.value)) {
+    cancel(cancelMessage);
+    process.exit(0);
+  }
+
+  return createOk(result.value as T[]);
+}
+
+/**
+ * Prompts the user to choose multiple options from a searchable list.
+ */
+export async function autocompleteMultiselectPrompts<T extends PromptValue>({
+  message,
+  options,
+  required,
+  placeholder = "Type to search...",
+  cancelMessage = "Selection canceled.",
+  errorMessage = "Failed to select options",
+}: {
+  message: string;
+  options: PromptOption<T>[];
+  required?: boolean;
+  placeholder?: string;
+  cancelMessage?: string;
+  errorMessage?: string;
+}): Promise<Result<T[], Error>> {
+  const initialValues = options.filter((option) => option.selected).map((option) => option.value);
+
+  const result = await checkPromiseReturn({
+    fn: async () =>
+      await autocompleteMultiselect({
+        message,
+        required,
+        placeholder,
         initialValues,
         options: options.map((option) => toClackOption(option)) as never,
       }),

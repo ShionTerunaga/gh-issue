@@ -16,8 +16,8 @@ import { ymlParse } from "../helper/yml";
 import { selectTemplate } from "../command/create";
 import { bold, green } from "picocolors";
 import {
+  autocompleteMultiselectPrompts,
   multilineTextPrompts,
-  multiselectPrompts,
   selectPrompts,
   textPrompts,
 } from "../command/common";
@@ -344,7 +344,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
 
     if (availableLabels.value.length > 0) {
       const templateLabels = foundTemplate.value.contents.labels ?? [];
-      const labelsResult = await multiselectPrompts<string>({
+      const labelsResult = await autocompleteMultiselectPrompts<string>({
         message: "Select labels",
         required: false,
         options: availableLabels.value.map((label) => ({
@@ -391,7 +391,7 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   }
 
   if (assignees.value.length > 0) {
-    const assigneeResult = await multiselectPrompts<string>({
+    const assigneeResult = await autocompleteMultiselectPrompts<string>({
       message: "Select assignees",
       required: false,
       options: assignees.value.map((assignee) => ({
