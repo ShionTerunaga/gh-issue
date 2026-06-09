@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { Command } from "commander";
 import { initAction } from "../action/init";
 import { createIssueAction } from "../action/create";
@@ -12,8 +13,19 @@ export const onPromptState = (state: { value: unknown; aborted: boolean; exited:
   }
 };
 
+function getPackageVersion() {
+  const packageJsonPath = new URL("../package.json", import.meta.url);
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as {
+    version?: unknown;
+  };
+
+  return typeof packageJson.version === "string" ? packageJson.version : "0.0.0";
+}
+
 export function createCommander() {
-  const program = new Command().description("Create GitHub issue templates").version("0.0.0");
+  const program = new Command()
+    .description("Create GitHub issue templates")
+    .version(getPackageVersion(), "-v, --version", "Output the version number");
 
   program
     .command("init")
