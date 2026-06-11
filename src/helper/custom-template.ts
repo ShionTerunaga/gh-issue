@@ -532,7 +532,7 @@ export async function createCustomIssueTemplate(cwd = process.cwd()) {
     return name;
   }
 
-  const description = await promptOptionalLongText("Add a template description?");
+  const description = await promptRequiredText("Template description");
 
   if (isErr(description)) {
     return description;
@@ -552,7 +552,7 @@ export async function createCustomIssueTemplate(cwd = process.cwd()) {
 
   const contents: IssueTemplate = {
     name: name.value,
-    description: isSome(description.value) ? description.value.value : undefined,
+    description: description.value,
     title: title.value.length > 0 ? title.value : undefined,
     body: body.value,
   };

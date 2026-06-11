@@ -43,6 +43,10 @@ export function createIssueMarkdown(issueContents: IssueContents[]): Result<stri
     return createErr(new Error("Title content is required"));
   }
 
+  if (titleContent.contents.trim().length === 0) {
+    return createErr(new Error("Issue title is required"));
+  }
+
   const bodyContents = issueContents.filter(
     (content) =>
       content.title !== TITLE_KEY && content.title !== LABEL_KEY && content.title !== ASSIGN_KEY,
