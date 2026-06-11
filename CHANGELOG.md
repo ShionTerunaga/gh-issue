@@ -1,5 +1,19 @@
 # gh-issue
 
+## 0.12.0
+
+### Minor Changes
+
+- [`2c771e3`](https://github.com/ShionTerunaga/gh-issue/commit/2c771e3733a8de611a1dfcdaf1dbf21dddb06c1e) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Added the -v option to display the version
+
+- [#80](https://github.com/ShionTerunaga/gh-issue/pull/80) [`909f3d6`](https://github.com/ShionTerunaga/gh-issue/commit/909f3d61db063a119931830d0c8586b6cb1330af) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Upgrade `ts-utility-kit`
+
+### Patch Changes
+
+- [`07fb34e`](https://github.com/ShionTerunaga/gh-issue/commit/07fb34e035559de99db8062bb476083e0254f8dc) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Change `multiselect` to `automultiselect`
+
+- [#83](https://github.com/ShionTerunaga/gh-issue/pull/83) [`ef1bd79`](https://github.com/ShionTerunaga/gh-issue/commit/ef1bd79b661c3dda5dbb194c5f8e870532f60e41) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - I fixed the type of the form parser.
+
 ## 0.11.0
 
 ### Minor Changes
