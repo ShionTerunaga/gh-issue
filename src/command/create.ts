@@ -6,7 +6,7 @@ export async function selectTemplate(templates: SelectMaterial[]): Promise<Resul
   return await selectPrompts({
     message: "Select an issue template",
     options: templates.map((tmp) => ({
-      title: tmp.name,
+      title: `${tmp.name} (${tmp.fileName})`,
       value: tmp.fileName,
     })),
     cancelMessage: "No template selected. Canceled.",
