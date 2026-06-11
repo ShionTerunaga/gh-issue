@@ -6,6 +6,7 @@ import {
   object,
   optional,
   string,
+  union,
   variant,
   type InferOutput,
 } from "valibot";
@@ -96,13 +97,15 @@ export const issueFormElementSchema = variant("type", [
   uploadElementSchema,
 ]);
 
+const stringListSchema = union([array(string()), string()]);
+
 export const issueTemplateSchema = object({
   name: string(),
-  description: optional(string()),
+  description: string(),
   title: optional(string()),
-  labels: optional(array(string())),
-  projects: optional(array(string())),
-  assignees: optional(array(string())),
+  labels: optional(stringListSchema),
+  projects: optional(stringListSchema),
+  assignees: optional(stringListSchema),
   type: optional(string()),
   body: array(issueFormElementSchema),
 });

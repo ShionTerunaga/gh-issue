@@ -304,9 +304,14 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     process.exit(1);
   }
 
+  if (title.value.trim().length === 0) {
+    log.error("Error: Issue title is required");
+    process.exit(1);
+  }
+
   issueContents.push({
     title: "title",
-    contents: title.value,
+    contents: title.value.trim(),
   });
 
   for (const tmp of foundTemplate.value.contents.body) {
