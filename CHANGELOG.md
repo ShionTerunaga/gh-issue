@@ -1,5 +1,15 @@
 # gh-issue
 
+## 0.13.0
+
+### Minor Changes
+
+- [#84](https://github.com/ShionTerunaga/gh-issue/pull/84) [`0f3434a`](https://github.com/ShionTerunaga/gh-issue/commit/0f3434a570bb7ecc76218e2f5465ee2998f10cc1) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - I also included the file names in the list of templates.
+
+### Patch Changes
+
+- [`5378779`](https://github.com/ShionTerunaga/gh-issue/commit/537877969a44690fa29b7f78b65a3ac436033c4e) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Security Measures
+
 ## 0.12.0
 
 ### Minor Changes
