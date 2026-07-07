@@ -6,10 +6,15 @@ import { tmpdir } from "node:os";
 import { isErr, isOk } from "ts-utility-kit/result";
 import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 
+const { mockExecFile } = vi.hoisted(() => ({
+  mockExecFile: vi.fn(),
+}));
+
 import { parseDraftIssue } from "../src/helper/draft-issue";
 import { createUniqueFieldId, slugifyFieldId } from "../src/helper/custom-template";
 import { editTextareaWithVim } from "../src/helper/textarea-editor";
 import { createIssueMarkdown } from "../src/helper/write-issue-markdown";
+import { getAssignableUsers } from "../src/action/create";
 import { main } from "../src/index";
 import { createIssueTemplate, createIssueTemplateYaml, initIssueTemplates } from "../src/templates";
 
@@ -38,6 +43,7 @@ vi.mock("../src/run", () => ({
 }));
 
 vi.mock("node:child_process", () => ({
+  execFile: mockExecFile,
   spawnSync: (_command: string, args: string[]) => {
     const [filePath] = args;
     openedEditorPath = filePath;
@@ -254,6 +260,37 @@ describe("parseDraftIssue", () => {
     expect(issue.labels).toEqual(["bug", "triage"]);
     expect(issue.assignees).toEqual(["octocat", "hubot"]);
     expect(issue.body).toBe("## Details\n\nBody");
+  });
+});
+
+describe("getAssignableUsers", () => {
+  it("fetches all assignable users via pagination", async () => {
+    mockExecFile.mockImplementation(
+      (
+        _command: string,
+        _args: string[],
+        _options: { encoding: string },
+        callback: (error: null, result: { stdout: string }) => void,
+      ) => {
+        callback(null, { stdout: "octocat\nhubot\n" });
+      },
+    );
+
+    const result = await getAssignableUsers("owner/repo");
+
+    expect(isOk(result)).toBe(true);
+
+    if (isErr(result)) {
+      throw result.err;
+    }
+
+    expect(mockExecFile).toHaveBeenCalledWith(
+      "gh",
+      ["api", "--paginate", "repos/owner/repo/assignees?per_page=100", "--jq", ".[].login"],
+      { encoding: "utf8" },
+      expect.any(Function),
+    );
+    expect(result.value).toEqual(["octocat", "hubot"]);
   });
 });
 

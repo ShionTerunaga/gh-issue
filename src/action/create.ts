@@ -23,7 +23,10 @@ import {
 } from "../command/common";
 import { createContents } from "../helper/create-contents";
 import type { IssueContents } from "../helper/create-contents";
-import { writeIssueMarkdown, writeRawIssueMarkdown } from "../helper/write-issue-markdown";
+import {
+  writeIssueMarkdown,
+  writeRawIssueMarkdown,
+} from "../helper/write-issue-markdown";
 import { log, spinner } from "@clack/prompts";
 import { editTextareaWithVim } from "../helper/textarea-editor";
 import {
@@ -94,7 +97,10 @@ async function getInputMode() {
   return createOk(inputModeResult.value);
 }
 
-async function createMarkdownDraft(templateContents: string, options: TextareaCreateOptions) {
+async function createMarkdownDraft(
+  templateContents: string,
+  options: TextareaCreateOptions,
+) {
   const presetEditorMode = resolveTextareaEditorMode(options);
   const inputMode: Result<TextareaEditorMode, Error> = isNone(presetEditorMode)
     ? await getInputMode()
@@ -109,7 +115,8 @@ async function createMarkdownDraft(templateContents: string, options: TextareaCr
       ? await editTextareaWithVim({
           initialValue: templateContents,
           title: "Issue markdown draft",
-          description: "Keep the front matter, especially the title field, at the top.",
+          description:
+            "Keep the front matter, especially the title field, at the top.",
         })
       : await multilineTextPrompts({
           message: "Edit the markdown issue draft",
@@ -126,7 +133,9 @@ async function createMarkdownDraft(templateContents: string, options: TextareaCr
   }
 
   if (!hasValidDraftFrontMatter(draftResult.value)) {
-    return createErr(new Error("Markdown draft must include front matter with a title field"));
+    return createErr(
+      new Error("Markdown draft must include front matter with a title field"),
+    );
   }
 
   return createOk(draftResult.value);
@@ -158,13 +167,17 @@ async function getCurrentRepository() {
   return createOk(repo.value);
 }
 
-async function getAssignableUsers(repo: string) {
+export async function getAssignableUsers(repo: string) {
   const list = await checkPromiseReturn({
     fn: async () =>
       (
-        await execFileAsync("gh", ["api", `repos/${repo}/assignees`, "--jq", ".[].login"], {
-          encoding: "utf8",
-        })
+        await execFileAsync(
+          "gh",
+          ["api", "--paginate", `repos/${repo}/assignees`, "--jq", ".[].login"],
+          {
+            encoding: "utf8",
+          },
+        )
       ).stdout
         .trim()
         .split("\n")
@@ -179,9 +192,13 @@ async function getAvailableLabels(repo: string) {
   const list = await checkPromiseReturn({
     fn: async () =>
       (
-        await execFileAsync("gh", ["api", `repos/${repo}/labels`, "--jq", ".[].name"], {
-          encoding: "utf8",
-        })
+        await execFileAsync(
+          "gh",
+          ["api", `repos/${repo}/labels`, "--jq", ".[].name"],
+          {
+            encoding: "utf8",
+          },
+        )
       ).stdout
         .trim()
         .split("\n")
@@ -196,7 +213,9 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   const ghIssueDir = join(process.cwd(), ".gh-issue");
 
   if (!existsSync(ghIssueDir)) {
-    log.error(".gh-issue directory does not exist. Please run `gh-issue-kit init` first.");
+    log.error(
+      ".gh-issue directory does not exist. Please run `gh-issue-kit init` first.",
+    );
     process.exit(1);
   }
 
@@ -234,7 +253,10 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
         kind: "markdown",
         fileName,
         name: formatMarkdownTemplateName(fileName),
-        contents: readFileSync(join(process.cwd(), ".github", "ISSUE_TEMPLATE", fileName), "utf8"),
+        contents: readFileSync(
+          join(process.cwd(), ".github", "ISSUE_TEMPLATE", fileName),
+          "utf8",
+        ),
       })),
     err: (e) => createErr(e as Error),
   });
@@ -244,7 +266,10 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
     process.exit(1);
   }
 
-  const templates: TemplateMaterial[] = [...yamlTemplates.value, ...markdownTemplates.value];
+  const templates: TemplateMaterial[] = [
+    ...yamlTemplates.value,
+    ...markdownTemplates.value,
+  ];
 
   const selectedMaterial: SelectMaterial[] = templates.map((tmp) => ({
     name: tmp.name,
@@ -268,14 +293,19 @@ export async function createIssueAction(options: TextareaCreateOptions = {}) {
   }
 
   if (foundTemplate.value.kind === "markdown") {
-    const markdownDraftResult = await createMarkdownDraft(foundTemplate.value.contents, options);
+    const markdownDraftResult = await createMarkdownDraft(
+      foundTemplate.value.contents,
+      options,
+    );
 
     if (isErr(markdownDraftResult)) {
       log.error(`Error: ${markdownDraftResult.err.message}`);
       process.exit(1);
     }
 
-    const writeMarkdownResult = await writeRawIssueMarkdown(markdownDraftResult.value);
+    const writeMarkdownResult = await writeRawIssueMarkdown(
+      markdownDraftResult.value,
+    );
 
     if (isErr(writeMarkdownResult)) {
       log.error(`Error: ${writeMarkdownResult.err.message}`);
