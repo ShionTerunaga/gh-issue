@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.13.1
+
+### Patch Changes
+
+- [`6934086`](https://github.com/ShionTerunaga/gh-issue/commit/6934086ce4b751c48b4442c05b6a0c0f49e4f7d9) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Set the upper limit of the `assign` list to unlimited
+
 ## 0.13.0
 
 ### Minor Changes
