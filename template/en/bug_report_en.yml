@@ -4,61 +4,61 @@ title: "[Bug]: "
 labels: ["bug", "triage"]
 projects: ["octo-org/1", "octo-org/44"]
 assignees:
-  - octocat
+    - octocat
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thank you for helping us by filing a bug report.
-  - type: input
-    id: contact
-    attributes:
-      label: Summary
-      description: Please describe the bug briefly.
-      placeholder: 'Example: "A build error occurred"'
-    validations:
-      required: false
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: Details
-      description: Also tell us what you expected to happen.
-      placeholder: Please describe what happened
-      value: "When I ran the `pnpm build` command, a build error occurred."
-    validations:
-      required: true
-  - type: dropdown
-    id: version
-    attributes:
-      label: Version
-      description: What version of our software are you running?
-      options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
-      default: 0
-    validations:
-      required: true
-  - type: dropdown
-    id: browsers
-    attributes:
-      label: Browser where the issue occurred
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
-  - type: textarea
-    id: logs
-    attributes:
-      label: Relevant log output
-      description: If you have any relevant logs, please paste them here. They will be automatically formatted as code, so backticks are not needed.
-      render: shell
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com).
-      options:
-        - label: I agree to follow this project's Code of Conduct
+    - type: markdown
+      attributes:
+          value: |
+              Thank you for helping us by filing a bug report.
+    - type: input
+      id: contact
+      attributes:
+          label: Summary
+          description: Please describe the bug briefly.
+          placeholder: 'Example: "A build error occurred"'
+      validations:
+          required: false
+    - type: textarea
+      id: what-happened
+      attributes:
+          label: Details
+          description: Also tell us what you expected to happen.
+          placeholder: Please describe what happened
+          value: "When I ran the `pnpm build` command, a build error occurred."
+      validations:
           required: true
+    - type: dropdown
+      id: version
+      attributes:
+          label: Version
+          description: What version of our software are you running?
+          options:
+              - 1.0.2 (Default)
+              - 1.0.3 (Edge)
+          default: 0
+      validations:
+          required: true
+    - type: dropdown
+      id: browsers
+      attributes:
+          label: Browser where the issue occurred
+          multiple: true
+          options:
+              - Firefox
+              - Chrome
+              - Safari
+              - Microsoft Edge
+    - type: textarea
+      id: logs
+      attributes:
+          label: Relevant log output
+          description: If you have any relevant logs, please paste them here. They will be automatically formatted as code, so backticks are not needed.
+          render: shell
+    - type: checkboxes
+      id: terms
+      attributes:
+          label: Code of Conduct
+          description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com).
+          options:
+              - label: I agree to follow this project's Code of Conduct
+                required: true

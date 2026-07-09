@@ -6,5 +6,5 @@ process.on("SIGTERM", handleSigTerm);
 process.on("SIGINT", handleSigTerm);
 
 export async function run(argv = process.argv) {
-  await runCommander(argv);
+    await runCommander(argv);
 }

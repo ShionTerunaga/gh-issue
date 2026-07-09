@@ -8,61 +8,61 @@ const DRAFTS_DIR = ".gh-issue";
 const README_FILE = `${DRAFTS_DIR}/README.md`;
 
 export interface DraftIssue {
-  filePath: string;
-  title: string;
-  body: string;
-  labels?: string[];
-  assignees?: string[];
+    filePath: string;
+    title: string;
+    body: string;
+    labels?: string[];
+    assignees?: string[];
 }
 
 export async function findDraftIssues(cwd = process.cwd()): Promise<Result<string[], Error>> {
-  const result = await checkPromiseReturn({
-    fn: () =>
-      fastGlob(`${DRAFTS_DIR}/**/*.md`, {
-        cwd,
-        onlyFiles: true,
-        dot: true,
-      }),
-    err: (error) => createErr(error as Error),
-  });
+    const result = await checkPromiseReturn({
+        fn: () =>
+            fastGlob(`${DRAFTS_DIR}/**/*.md`, {
+                cwd,
+                onlyFiles: true,
+                dot: true,
+            }),
+        err: (error) => createErr(error as Error),
+    });
 
-  if (isErr(result)) {
-    return result;
-  }
+    if (isErr(result)) {
+        return result;
+    }
 
-  const draftFiles = result.value.filter((filePath) => filePath !== README_FILE);
+    const draftFiles = result.value.filter((filePath) => filePath !== README_FILE);
 
-  return createOk(draftFiles);
+    return createOk(draftFiles);
 }
 
 export function parseDraftIssue(filePath: string, cwd = process.cwd()): DraftIssue {
-  const raw = readFileSync(join(cwd, filePath), "utf8");
-  const frontMatterMatch = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+    const raw = readFileSync(join(cwd, filePath), "utf8");
+    const frontMatterMatch = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
 
-  if (!frontMatterMatch) {
-    throw new Error(`Missing front matter in ${filePath}`);
-  }
+    if (!frontMatterMatch) {
+        throw new Error(`Missing front matter in ${filePath}`);
+    }
 
-  const [, frontMatter, markdownBody] = frontMatterMatch;
-  const titleMatch = frontMatter.match(/^title:\s*(.+)$/m);
-  const labelMatch = frontMatter.match(/^label:\s*(.+)$/m);
-  const assignMatch = frontMatter.match(/^assign:\s*(.+)$/m);
+    const [, frontMatter, markdownBody] = frontMatterMatch;
+    const titleMatch = frontMatter.match(/^title:\s*(.+)$/m);
+    const labelMatch = frontMatter.match(/^label:\s*(.+)$/m);
+    const assignMatch = frontMatter.match(/^assign:\s*(.+)$/m);
 
-  if (!titleMatch) {
-    throw new Error(`Missing title in front matter: ${filePath}`);
-  }
+    if (!titleMatch) {
+        throw new Error(`Missing title in front matter: ${filePath}`);
+    }
 
-  return {
-    filePath,
-    title: titleMatch[1].trim(),
-    body: markdownBody.trim(),
-    labels: labelMatch?.[1]
-      ?.split(",")
-      .map((label) => label.trim())
-      .filter(Boolean),
-    assignees: assignMatch?.[1]
-      ?.split(",")
-      .map((assignee) => assignee.trim())
-      .filter(Boolean),
-  };
+    return {
+        filePath,
+        title: titleMatch[1].trim(),
+        body: markdownBody.trim(),
+        labels: labelMatch?.[1]
+            ?.split(",")
+            .map((label) => label.trim())
+            .filter(Boolean),
+        assignees: assignMatch?.[1]
+            ?.split(",")
+            .map((assignee) => assignee.trim())
+            .filter(Boolean),
+    };
 }

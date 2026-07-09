@@ -9,93 +9,93 @@ type IssueTemplateType = "bug_report" | "feature_request";
 export type Language = "en" | "ja";
 
 export interface InitOptions {
-  type: Option<IssueTemplateType[]>;
-  lang: Option<Language[]>;
-  yes: Option<boolean>;
+    type: Option<IssueTemplateType[]>;
+    lang: Option<Language[]>;
+    yes: Option<boolean>;
 }
 
 const issueTemplateTypeChoices: PromptOption<IssueTemplateType>[] = [
-  {
-    title: "Bug report",
-    value: "bug_report",
-    selected: true,
-  },
-  {
-    title: "Feature request",
-    value: "feature_request",
-    selected: true,
-  },
+    {
+        title: "Bug report",
+        value: "bug_report",
+        selected: true,
+    },
+    {
+        title: "Feature request",
+        value: "feature_request",
+        selected: true,
+    },
 ];
 
 const languageChoices: PromptOption<Language>[] = [
-  {
-    title: "English",
-    value: "en",
-    selected: true,
-  },
-  {
-    title: "Japanese",
-    value: "ja",
-    selected: false,
-  },
+    {
+        title: "English",
+        value: "en",
+        selected: true,
+    },
+    {
+        title: "Japanese",
+        value: "ja",
+        selected: false,
+    },
 ];
 
 export async function selectIssueTemplateTypes(): Promise<Result<IssueTemplateType[], Error>> {
-  return await multiselectPrompts({
-    message: "Select issue template types",
-    options: issueTemplateTypeChoices,
-    cancelMessage: "No template types selected. Canceled.",
-    errorMessage: "Failed to select issue template types",
-  });
+    return await multiselectPrompts({
+        message: "Select issue template types",
+        options: issueTemplateTypeChoices,
+        cancelMessage: "No template types selected. Canceled.",
+        errorMessage: "Failed to select issue template types",
+    });
 }
 
 export async function selectLanguages(): Promise<Result<Language[], Error>> {
-  return await multiselectPrompts({
-    message: "Select template languages",
-    options: languageChoices,
-    cancelMessage: "No languages selected. Canceled.",
-    errorMessage: "Failed to select template languages",
-  });
+    return await multiselectPrompts({
+        message: "Select template languages",
+        options: languageChoices,
+        cancelMessage: "No languages selected. Canceled.",
+        errorMessage: "Failed to select template languages",
+    });
 }
 
 export async function confirmInit(): Promise<Result<boolean, Error>> {
-  const response = await checkPromiseReturn({
-    fn: async () =>
-      await confirm({
-        message: `This will create issue templates in .github/ISSUE_TEMPLATE. Do you want to continue?`,
-      }),
-    err: (e) => createErr(createPromptError("Failed to get user confirmation", e)),
-  });
+    const response = await checkPromiseReturn({
+        fn: async () =>
+            await confirm({
+                message: `This will create issue templates in .github/ISSUE_TEMPLATE. Do you want to continue?`,
+            }),
+        err: (e) => createErr(createPromptError("Failed to get user confirmation", e)),
+    });
 
-  if (isErr(response)) {
-    return response;
-  }
+    if (isErr(response)) {
+        return response;
+    }
 
-  if (isCancel(response.value)) {
-    cancel("Initialization canceled.");
-    process.exit(0);
-  }
+    if (isCancel(response.value)) {
+        cancel("Initialization canceled.");
+        process.exit(0);
+    }
 
-  return createOk(response.value as boolean);
+    return createOk(response.value as boolean);
 }
 
 export async function confirmCreateTemplates(): Promise<Result<boolean, Error>> {
-  const response = await checkPromiseReturn({
-    fn: async () =>
-      await confirm({
-        message: `Do you want to create issue templates in .github/ISSUE_TEMPLATE?`,
-      }),
-    err: (e) => createErr(createPromptError("Failed to get user confirmation", e)),
-  });
+    const response = await checkPromiseReturn({
+        fn: async () =>
+            await confirm({
+                message: `Do you want to create issue templates in .github/ISSUE_TEMPLATE?`,
+            }),
+        err: (e) => createErr(createPromptError("Failed to get user confirmation", e)),
+    });
 
-  if (isErr(response)) {
-    return response;
-  }
+    if (isErr(response)) {
+        return response;
+    }
 
-  if (isCancel(response.value)) {
-    cancel("Initialization canceled.");
-    process.exit(0);
-  }
+    if (isCancel(response.value)) {
+        cancel("Initialization canceled.");
+        process.exit(0);
+    }
 
-  return createOk(response.value as boolean);
+    return createOk(response.value as boolean);
 }

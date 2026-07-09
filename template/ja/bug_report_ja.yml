@@ -4,63 +4,63 @@ title: "[Bug]: "
 labels: ["bug", "triage"]
 projects: ["octo-org/1", "octo-org/44"]
 assignees:
-  - octocat
+    - octocat
 body:
-  - type: markdown
-    attributes:
-      value: |
-        バグ報告にご協力いただきありがとうございます。
-  - type: input
-    id: contact
-    attributes:
-      label: 概要
-      description: バグの概要に記述してください。
-      placeholder: |
-        例: "ビルドエラーが起こった"
-    validations:
-      required: false
-  - type: textarea
-    id: what-happened
-    attributes:
-      label: 詳細
-      description: あわせて、どうなることを期待していたかも教えてください。
-      placeholder: |
-        発生した内容を記入してください
-      value: "pnpm build コマンドを実行したところ、ビルドエラーが発生しました。"
-    validations:
-      required: true
-  - type: dropdown
-    id: version
-    attributes:
-      label: バージョン
-      description: 利用中のソフトウェアのバージョンを選択してください。
-      options:
-        - 1.0.2 (Default)
-        - 1.0.3 (Edge)
-      default: 0
-    validations:
-      required: true
-  - type: dropdown
-    id: browsers
-    attributes:
-      label: 問題が発生したブラウザ
-      multiple: true
-      options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
-  - type: textarea
-    id: logs
-    attributes:
-      label: 関連するログ出力
-      description: 関連するログがあれば貼り付けてください。自動でコード形式になるため、バッククォートは不要です。
-      render: shell
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: 行動規範
-      description: この Issue を送信することで、[行動規範](https://example.com) に従うことに同意したものとみなされます。
-      options:
-        - label: このプロジェクトの行動規範に従うことに同意します
+    - type: markdown
+      attributes:
+          value: |
+              バグ報告にご協力いただきありがとうございます。
+    - type: input
+      id: contact
+      attributes:
+          label: 概要
+          description: バグの概要に記述してください。
+          placeholder: |
+              例: "ビルドエラーが起こった"
+      validations:
+          required: false
+    - type: textarea
+      id: what-happened
+      attributes:
+          label: 詳細
+          description: あわせて、どうなることを期待していたかも教えてください。
+          placeholder: |
+              発生した内容を記入してください
+          value: "pnpm build コマンドを実行したところ、ビルドエラーが発生しました。"
+      validations:
           required: true
+    - type: dropdown
+      id: version
+      attributes:
+          label: バージョン
+          description: 利用中のソフトウェアのバージョンを選択してください。
+          options:
+              - 1.0.2 (Default)
+              - 1.0.3 (Edge)
+          default: 0
+      validations:
+          required: true
+    - type: dropdown
+      id: browsers
+      attributes:
+          label: 問題が発生したブラウザ
+          multiple: true
+          options:
+              - Firefox
+              - Chrome
+              - Safari
+              - Microsoft Edge
+    - type: textarea
+      id: logs
+      attributes:
+          label: 関連するログ出力
+          description: 関連するログがあれば貼り付けてください。自動でコード形式になるため、バッククォートは不要です。
+          render: shell
+    - type: checkboxes
+      id: terms
+      attributes:
+          label: 行動規範
+          description: この Issue を送信することで、[行動規範](https://example.com) に従うことに同意したものとみなされます。
+          options:
+              - label: このプロジェクトの行動規範に従うことに同意します
+                required: true

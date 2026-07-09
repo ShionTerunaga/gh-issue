@@ -53,12 +53,12 @@ Example `package.json` scripts:
 
 ```json
 {
-  "scripts": {
-    "gh-init": "gh-issue-kit init",
-    "gh-add-tmp": "gh-issue-kit add-tmp",
-    "gh-create": "gh-issue-kit create",
-    "gh-send": "gh-issue-kit send"
-  }
+    "scripts": {
+        "gh-init": "gh-issue-kit init",
+        "gh-add-tmp": "gh-issue-kit add-tmp",
+        "gh-create": "gh-issue-kit create",
+        "gh-send": "gh-issue-kit send"
+    }
 }
 ```
 

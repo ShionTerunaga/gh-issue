@@ -5,58 +5,58 @@ import { checkPromiseReturn, createErr, createOk, isErr } from "ts-utility-kit/r
 import type { Result } from "ts-utility-kit/result";
 
 interface CopyOptions {
-  cwd?: string;
-  rename?: (basename: string) => string;
-  parents?: boolean;
+    cwd?: string;
+    rename?: (basename: string) => string;
+    parents?: boolean;
 }
 
 const identity = (x: string) => x;
 const glob = fastGlob.async;
 
 export async function copy(
-  src: string | string[],
-  dest: string,
-  { cwd, rename = identity, parents = true }: CopyOptions,
+    src: string | string[],
+    dest: string,
+    { cwd, rename = identity, parents = true }: CopyOptions,
 ): Promise<Result<() => void, Error>> {
-  const sources = typeof src === "string" ? [src] : src;
+    const sources = typeof src === "string" ? [src] : src;
 
-  if (sources.length === 0 || dest === "") {
-    return createErr(new Error("src or dest is empty"));
-  }
+    if (sources.length === 0 || dest === "") {
+        return createErr(new Error("src or dest is empty"));
+    }
 
-  const sourceFiles = await checkPromiseReturn({
-    fn: () =>
-      glob(sources, {
-        cwd,
-        dot: true,
-        absolute: false,
-        stats: false,
-        onlyFiles: true,
-      }),
-    err: () => createErr(new Error("Failed to glob source files")),
-  });
+    const sourceFiles = await checkPromiseReturn({
+        fn: () =>
+            glob(sources, {
+                cwd,
+                dot: true,
+                absolute: false,
+                stats: false,
+                onlyFiles: true,
+            }),
+        err: () => createErr(new Error("Failed to glob source files")),
+    });
 
-  if (isErr(sourceFiles)) {
-    return sourceFiles;
-  }
+    if (isErr(sourceFiles)) {
+        return sourceFiles;
+    }
 
-  const destRelativeToCwd = cwd ? resolve(cwd, dest) : dest;
+    const destRelativeToCwd = cwd ? resolve(cwd, dest) : dest;
 
-  for (const p of sourceFiles.value) {
-    const dirName = dirname(p);
+    for (const p of sourceFiles.value) {
+        const dirName = dirname(p);
 
-    const baseName = rename(basename(p));
+        const baseName = rename(basename(p));
 
-    const from = cwd ? resolve(cwd, p) : p;
+        const from = cwd ? resolve(cwd, p) : p;
 
-    const to = parents
-      ? join(destRelativeToCwd, dirName, baseName)
-      : join(destRelativeToCwd, baseName);
+        const to = parents
+            ? join(destRelativeToCwd, dirName, baseName)
+            : join(destRelativeToCwd, baseName);
 
-    await mkdir(dirname(to), { recursive: true });
+        await mkdir(dirname(to), { recursive: true });
 
-    await copyFile(from, to);
-  }
+        await copyFile(from, to);
+    }
 
-  return createOk(() => {});
+    return createOk(() => {});
 }
