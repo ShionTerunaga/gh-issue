@@ -1,5 +1,1 @@
-export {
-    createIssueTemplate,
-    createIssueTemplateYaml,
-    initIssueTemplates,
-} from "./templates";
+export { createIssueTemplate, createIssueTemplateYaml, initIssueTemplates } from "./templates";

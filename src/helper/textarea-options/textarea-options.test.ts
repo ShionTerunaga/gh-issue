@@ -1,9 +1,6 @@
 import { isNone, isSome } from "ts-utility-kit/option";
 import { describe, expect, it } from "vitest";
-import {
-    requiredTextareaEditorModeOptions,
-    resolveTextareaEditorMode,
-} from "./index";
+import { requiredTextareaEditorModeOptions, resolveTextareaEditorMode } from "./index";
 
 describe("requiredTextareaEditorModeOptions", () => {
     it("contains vim and direct modes", () => {
