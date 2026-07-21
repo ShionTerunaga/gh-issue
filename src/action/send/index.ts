@@ -1,1 +1,0 @@
-export { sendIssueAction } from "./send";

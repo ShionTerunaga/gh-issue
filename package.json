@@ -1,80 +1,36 @@
 {
-    "name": "gh-issue-kit",
-    "version": "0.14.0",
-    "description": "A command line tool for GitHub issues.",
-    "homepage": "https://github.com/ShionTerunaga/gh-issue#readme",
-    "bugs": {
-        "url": "https://github.com/ShionTerunaga/gh-issue/issues"
-    },
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/ShionTerunaga/gh-issue.git"
-    },
-    "bin": {
-        "gh-issue-kit": "./dist/index.js"
-    },
-    "files": [
-        "dist",
-        "README.md",
-        "LICENSE"
-    ],
-    "type": "module",
-    "main": "./dist/index.js",
-    "exports": "./dist/index.js",
-    "publishConfig": {
-        "access": "public",
-        "registry": "https://registry.npmjs.org/"
-    },
-    "scripts": {
-        "build": "rm -rf dist && rolldown -c rolldown.config.ts && pnpm copy:template",
-        "start": "pnpm build && node dist/index.js",
-        "changeset": "changeset",
-        "copy:template": "node --experimental-strip-types scripts/copy-template.ts",
-        "test": "vitest run",
-        "lint": "oxlint .",
-        "lint:fix": "oxlint --fix .",
-        "format": "oxfmt .",
-        "format:check": "oxfmt --check .",
-        "typecheck": "tsgo -p tsconfig.json --noEmit",
-        "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm build",
-        "prepack": "pnpm build",
-        "initial": "lefthook install",
-        "version:packages": "changeset version"
-    },
-    "dependencies": {
-        "@clack/prompts": "^1.5.0",
-        "commander": "^14.0.3",
-        "fast-glob": "^3.3.3",
-        "js-yaml": "^5.2.0",
-        "picocolors": "^1.1.1",
-        "ts-utility-kit": "^2.0.0",
-        "valibot": "^1.3.1",
-        "vite": "^8.1.0",
-        "yaml-parser": "^3.5.3"
-    },
-    "devDependencies": {
-        "@changesets/changelog-github": "^0.6.0",
-        "@changesets/cli": "^2.31.0",
-        "@commitlint/cli": "^20.5.2",
-        "@commitlint/config-conventional": "^20.5.0",
-        "@types/node": "25.6.0",
-        "@typescript/native-preview": "beta",
-        "lefthook": "^2.1.6",
-        "oxfmt": "0.58.0",
-        "oxlint": "1.73.0",
-        "rolldown": "^1.0.2",
-        "tsx": "4.22.4",
-        "typescript": "^7.0.2",
-        "vitest": "4.1.5"
-    },
-    "engines": {
-        "node": ">=20"
-    },
-    "packageManager": "pnpm@10.18.3",
-    "pnpm": {
-        "overrides": {
-            "js-yaml": "4.2.0"
-        }
-    }
+  "name": "gh-issue-kit",
+  "version": "0.14.0",
+  "description": "A command line tool for GitHub issues.",
+  "homepage": "https://github.com/ShionTerunaga/gh-issue#readme",
+  "bugs": {
+    "url": "https://github.com/ShionTerunaga/gh-issue/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShionTerunaga/gh-issue.git"
+  },
+  "bin": {
+    "gh-issue-kit": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "fast-glob": "^3.3.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
 }
