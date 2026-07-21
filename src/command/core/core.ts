@@ -1,0 +1,59 @@
+import { readFileSync } from "node:fs";
+import { Command } from "commander";
+import { initAction } from "../../action/init";
+import { createIssueAction } from "../../action/create";
+import { sendIssueAction } from "../../action/send";
+import { addTemplateAction } from "../../action/add-tmp";
+
+export const onPromptState = (state: { value: unknown; aborted: boolean; exited: boolean }) => {
+    if (state.aborted) {
+        process.stdout.write("\x1B[?25h");
+        process.stdout.write("\n");
+        process.exit(1);
+    }
+};
+
+function getPackageVersion() {
+    const packageJsonPath = new URL("../../package.json", import.meta.url);
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as {
+        version?: unknown;
+    };
+
+    return typeof packageJson.version === "string" ? packageJson.version : "0.0.0";
+}
+
+export function createCommander() {
+    const program = new Command()
+        .description("Create GitHub issue templates")
+        .version(getPackageVersion(), "-v, --version", "Output the version number");
+
+    program
+        .command("init")
+        .description("Create bug report and feature request issue templates")
+        .action(initAction);
+
+    program
+        .command("create")
+        .description("Create an issue template")
+        .option("--vim", "Use Vim editor for textarea")
+        .option("--direct", "Use direct multiline input for textarea")
+        .action((options) => createIssueAction(options));
+
+    program
+        .command("send")
+        .description("Send an issue draft to GitHub")
+        .option("--all", "Send all issue drafts without selection prompt")
+        .action((options) => sendIssueAction(options));
+
+    program
+        .command("add-tmp")
+        .alias("add")
+        .description("Add a new issue template to .github/ISSUE_TEMPLATE")
+        .action(addTemplateAction);
+
+    return program;
+}
+
+export async function runCommander(argv = process.argv) {
+    await createCommander().parseAsync(argv);
+}

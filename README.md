@@ -193,7 +193,8 @@ This command:
 
 - reads draft files from `.gh-issue/`
 - prompts you to select one or more drafts
-- creates GitHub Issues with `gh issue create`
+- creates GitHub Issues with the GitHub API
+- links drafts with `parent:` front matter as sub-issues
 - removes each draft after successful submission
 
 Example:
@@ -229,6 +230,7 @@ Example:
 ```md
 ---
 title: [BUG] Build fails on CI
+parent: 123
 ---
 
 ## Summary
