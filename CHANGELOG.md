@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.14.0
+
+### Minor Changes
+
+- [`e49dace`](https://github.com/ShionTerunaga/gh-issue/commit/e49dace6ed45f45274f3b270351f23a3c00cfe70) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Adding a Subissue
+
 ## 0.13.1
 
 ### Patch Changes
