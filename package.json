@@ -74,7 +74,8 @@
     "packageManager": "pnpm@10.18.3",
     "pnpm": {
         "overrides": {
-            "js-yaml": "4.2.0"
+            "js-yaml": "4.3.0",
+            "fast-uri": "3.1.4"
         }
     }
 }
