@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.14.1
+
+### Patch Changes
+
+- [`be488b4`](https://github.com/ShionTerunaga/gh-issue/commit/be488b41d53fa29031dbbdd3f2795644752acbfb) Thanks [@ShionTerunaga](https://github.com/ShionTerunaga)! - Upgrade package
+
 ## 0.14.0
 
 ### Minor Changes
