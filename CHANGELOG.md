@@ -1,5 +1,11 @@
 # gh-issue
 
+## 0.14.2
+
+### Patch Changes
+
+- [#92](https://github.com/ShionTerunaga/gh-issue/pull/92) [`48679a1`](https://github.com/ShionTerunaga/gh-issue/commit/48679a1c2f90f45e957429330925f0574fa7ef0d) Thanks [@sdtech-terunagashion](https://github.com/sdtech-terunagashion)! - Fix package.json version resolution when running the bundled CLI
+
 ## 0.14.1
 
 ### Patch Changes
