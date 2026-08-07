@@ -14,7 +14,7 @@ export const onPromptState = (state: { value: unknown; aborted: boolean; exited:
 };
 
 function getPackageVersion() {
-    const packageJsonPath = new URL("../../package.json", import.meta.url);
+    const packageJsonPath = new URL("../package.json", import.meta.url);
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as {
         version?: unknown;
     };
