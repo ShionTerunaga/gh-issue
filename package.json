@@ -46,7 +46,7 @@
         "@clack/prompts": "^1.5.0",
         "commander": "^14.0.3",
         "fast-glob": "^3.3.3",
-        "js-yaml": "^5.2.0",
+        "js-yaml": "5.4.2",
         "picocolors": "^1.1.1",
         "ts-utility-kit": "^2.0.0",
         "valibot": "^1.4.2",
@@ -56,7 +56,7 @@
     "devDependencies": {
         "@changesets/changelog-github": "^0.6.0",
         "@changesets/cli": "^2.31.0",
-        "@commitlint/cli": "^20.5.2",
+        "@commitlint/cli": "^21.2.3",
         "@commitlint/config-conventional": "^20.5.0",
         "@types/node": "25.6.0",
         "@typescript/native-preview": "beta",
